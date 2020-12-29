@@ -1,0 +1,59 @@
+html,
+body,
+main {
+  min-height: 100vh;
+overflow: hidden;
+  margin: 0;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.background {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+  
+    height: 200vh;
+    width: 100vw;
+  
+    transform: rotate(-15deg);
+    background-color: black;
+  
+    z-index: -1;
+  }
+
+.title {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  /* background: red; */
+  font-family: 'Poppins', sans-serif;
+font-size: 48px;
+}
+
+.title-left{
+    color: white;
+    margin-right: 10%;
+    margin-left: 30%;
+}
+
+.title-rigth{
+    color: black;
+}
+
+.footer {
+  background: green;
+
+  display: flex;
+  flex-direction: row;
+}
+
+
