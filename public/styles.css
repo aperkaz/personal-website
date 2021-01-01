@@ -1,3 +1,15 @@
+/* Variables */
+
+:root {
+  --main-bg-color: black;
+  --bg-triangle-width: 200px;
+
+  --bg-z-index: -1;
+}
+
+
+/* Styles */
+
 html,
 body,
 main {
@@ -6,22 +18,30 @@ main {
   margin: 0;
 }
 
-main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+#background-left {
+  position: absolute;
+
+  height: 100vh;
+  width: calc(50vw - var(--bg-triangle-width) / 2);
+
+  background-color: var(--main-bg-color);
+  
+  z-index: var(--bg-z-index);
 }
 
-.background {
+#background-right {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  height: 200vh;
-  width: 99vw;
-  transform: rotate(-15deg);
-  background-color: black;
-  z-index: -1;
+
+  left: calc(50% - var(--bg-triangle-width) /2);
+
+  width: 0;
+  height: 0;
+  border-left: 0px solid transparent;
+  border-right: var(--bg-triangle-width) solid transparent;
+
+  border-bottom: 100vh solid var(--main-bg-color);
+
+  z-index: var(--bg-z-index);
 }
 
 .title {
