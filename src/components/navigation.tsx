@@ -33,7 +33,7 @@ const Navigation = () => {
         <NextLink href="/blog">
           <Link _hover={undefined}>
             <Button variant="nav" size={buttonSize}>
-              Blog
+              Technical blog
             </Button>
           </Link>
         </NextLink>

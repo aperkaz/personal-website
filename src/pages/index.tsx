@@ -21,7 +21,7 @@ const GREEN = '#38ff00';
 // TODONOW: add effect to image from https://gatsby-simplefolio.netlify.app/
 export default function Home() {
   const { colorMode } = useColorMode();
-  const [showCV, setShowCV] = useState(false);
+
   const linkColor = useColorModeValue('blue.500', 'blue.400');
   const lieberLieberLogo = useColorModeValue('LieberLieber_Logo.png', 'LieberLieber_Logo_Dark.png');
 
@@ -77,30 +77,37 @@ export default function Home() {
               Freelance Frontend Engineer 👨‍💻
             </Box>
           </Box>
+          {/* TODONOW: move this as part of a icon-heavy section */}
           <Box as="h2" fontSize="2xl" fontWeight="400" mt={10}>
-            Preficient in{' '}
+            Proficient in{' '}
             <Box as="strong" fontWeight="600">
               React, Node.js, and TypeScript.
             </Box>{' '}
-            <br />I ocasinally write for
+            <br />I occasionally write for
             <Link
-              href="https://twitter.com/aperkaz"
+              href="https://www.freecodecamp.org/news/author/aperkaz"
               ml={2}
               mr={1}
               isExternal
+              whiteSpace="nowrap"
               _hover={{ textDecor: 'none', color: '#1fa1f1' }}
             >
-              FreeCodeCamp{' '}
-            </Link>
+              <Box as="span" borderBottom="1px solid currentColor">
+                FreeCodeCamp
+              </Box>
+            </Link>{' '}
             and
             <Link
-              href="https://twitter.com/aperkaz"
+              href="https://blog.logrocket.com/author/alainperkaz"
               ml={2}
               mr={1}
               isExternal
               _hover={{ textDecor: 'none', color: '#1fa1f1' }}
             >
-              LogRocket.
+              <Box as="span" borderBottom="1px solid currentColor">
+                LogRocket
+              </Box>
+              .
             </Link>
           </Box>
         </MotionFlex>
@@ -120,6 +127,7 @@ export default function Home() {
           },
         }}
       ></MotionBox>
+      {/* TODONOW: remove this section */}
       {/* <MotionFlex
         mt={[6, 12]}
         w="100%"
@@ -241,71 +249,87 @@ export default function Home() {
           <Divider my={10} />
         </Box>
       </MotionFlex> */}
-      <Flex mt={20} w="100%" align="left" direction="column">
-        <Header id="cv" underlineColor={TURQUOISE}>
-          CV
-        </Header>
-        <Paragraph>TODONOW:</Paragraph>
-        <Box px={[4, 8, 12]}>
-          <Divider my={10} />
-          <CVDescription
-            linkColor={linkColor}
-            url="https://seriouscode.io"
-            logo={
-              <Flex fontSize="3xl" minW="228px" minH="180px" align="center" justify="center">
-                <strong>seriouscode</strong>
-              </Flex>
-            }
-            name="seriouscode GmbH"
-            status="ongoing"
-            fromTo="since April 2021"
-            summary="After 7 years of being employed as a software developer it was time to make a dream come true. I am soon going to launch a blog post with more detailed informations. Until then you can check out our website."
-          />
-          <Divider my={10} />
-          <CVDescription
-            linkColor={linkColor}
-            url="https://untis.at"
-            logo={<UntisLogo />}
-            name="Untis GmbH"
-            status="past"
-            fromTo="April 2019 - March 2021"
-            summary="I was employed at Untis as a senior software developer. My responsibilities were the managment of the web-frontend, I did several coordinative tasks and I also found myself implementing stuff in the backend."
-          />
-          <Divider my={10} />
-          <CVDescription
-            linkColor={linkColor}
-            url="https://cloudflight.io"
-            logo={<CatalystsLogo />}
-            name="Catalysts GmbH"
-            knownAs="Cloudflight"
-            status="past"
-            fromTo="August 2015 - March 2019"
-            summary="In my time at Catalysts I had the chance to gain so much experience. Of course also in software development, but mostly in project managment, team leading and social skills. I led several projects and did full stack development."
-          />
-          <Divider my={10} />
-          <CVDescription
-            linkColor={linkColor}
-            url="https://lieberlieber.com"
-            logo={<img src={'/images/' + lieberLieberLogo} width={238} height={37} alt="LieberLieber GmbH" />}
-            name="LieberLieber GmbH"
-            status="past"
-            fromTo="March 2014 - August 2015"
-            summary="LieberLieber was my first employer and I had the chance to gain first experiences in professional software development. Most of the time I was busy developing Enterprise Architect Extensions with C#."
-          />
-          <Divider my={10} />
-          <CVDescription
-            linkColor={linkColor}
-            url="https://htlwienwest.at"
-            logo={<HtlLogo />}
-            name="HTL Ottakring"
-            knownAs="HTL Wien West"
-            status="past"
-            fromTo="until June 2013"
-            summary="My education at the HTL Ottakring encouraged my interests and skills in software development. I finished the information technology branch of the HTL Ottakring."
-          />
-          <Divider my={10} />
-        </Box>
-      </Flex>
+      <MotionFlex
+        mt={[6, 12]}
+        w="100%"
+        align="left"
+        direction="column"
+        opacity="0"
+        animate={{
+          opacity: 1,
+          transition: {
+            delay: ANIMATION_DURATION + ANIMATION_DURATION - 0.2,
+            duration: ANIMATION_DURATION,
+          },
+        }}
+      >
+        <Flex mt={20} w="100%" align="left" direction="column">
+          <Header id="work story" underlineColor={TURQUOISE}>
+            Work story
+          </Header>
+          <Paragraph>TODONOW:</Paragraph>
+          <Box px={[4, 8, 12]}>
+            <Divider my={10} />
+            <CVDescription
+              linkColor={linkColor}
+              url="https://seriouscode.io"
+              logo={
+                <Flex fontSize="3xl" minW="228px" minH="180px" align="center" justify="center">
+                  <strong>seriouscode</strong>
+                </Flex>
+              }
+              name="seriouscode GmbH"
+              status="ongoing"
+              fromTo="since April 2021"
+              summary="After 7 years of being employed as a software developer it was time to make a dream come true. I am soon going to launch a blog post with more detailed informations. Until then you can check out our website."
+            />
+            <Divider my={10} />
+            <CVDescription
+              linkColor={linkColor}
+              url="https://untis.at"
+              logo={<UntisLogo />}
+              name="Untis GmbH"
+              status="past"
+              fromTo="April 2019 - March 2021"
+              summary="I was employed at Untis as a senior software developer. My responsibilities were the managment of the web-frontend, I did several coordinative tasks and I also found myself implementing stuff in the backend."
+            />
+            <Divider my={10} />
+            <CVDescription
+              linkColor={linkColor}
+              url="https://cloudflight.io"
+              logo={<CatalystsLogo />}
+              name="Catalysts GmbH"
+              knownAs="Cloudflight"
+              status="past"
+              fromTo="August 2015 - March 2019"
+              summary="In my time at Catalysts I had the chance to gain so much experience. Of course also in software development, but mostly in project managment, team leading and social skills. I led several projects and did full stack development."
+            />
+            <Divider my={10} />
+            <CVDescription
+              linkColor={linkColor}
+              url="https://lieberlieber.com"
+              logo={<img src={'/images/' + lieberLieberLogo} width={238} height={37} alt="LieberLieber GmbH" />}
+              name="LieberLieber GmbH"
+              status="past"
+              fromTo="March 2014 - August 2015"
+              summary="LieberLieber was my first employer and I had the chance to gain first experiences in professional software development. Most of the time I was busy developing Enterprise Architect Extensions with C#."
+            />
+            <Divider my={10} />
+            <CVDescription
+              linkColor={linkColor}
+              url="https://htlwienwest.at"
+              logo={<HtlLogo />}
+              name="HTL Ottakring"
+              knownAs="HTL Wien West"
+              status="past"
+              fromTo="until June 2013"
+              summary="My education at the HTL Ottakring encouraged my interests and skills in software development. I finished the information technology branch of the HTL Ottakring."
+            />
+            <Divider my={10} />
+          </Box>
+        </Flex>
+      </MotionFlex>
+
       <Flex mt={20} w="100%" align="left" direction="column">
         <Header id="contact" underlineColor={GREEN}>
           Contact
