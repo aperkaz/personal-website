@@ -5,10 +5,6 @@ import { FaTwitter, FaFreeCodeCamp } from 'react-icons/fa';
 
 import Header from '../components/header';
 import Paragraph from '../components/paragraph';
-import CVDescription from '../components/cv-description';
-import UntisLogo from '../style/logos/untis-logo';
-import CatalystsLogo from '../style/logos/catalysts-logo';
-import HtlLogo from '../style/logos/htl-logo';
 import Avatar from '../components/avatar';
 import { MotionBox, MotionFlex } from '../components/motion';
 
