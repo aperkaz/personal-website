@@ -5,6 +5,7 @@ import { Fragment } from 'react';
 import BlogCard from '../components/blog-card';
 import { getAllFilesFrontMatter } from '../utils/mdx';
 
+// TODONOW: extract this to theme!
 const ORANGE = '#ff940070';
 const PURPLE = '#ff007a70';
 const TURQUOISE = '#00e0ff70';

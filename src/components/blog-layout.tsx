@@ -11,6 +11,11 @@ import ScrollProgressbar from './scroll-progessbar';
 export default function BlogLayout({ frontMatter, children }: PropsWithChildren<any>) {
   const date = format(parseISO(frontMatter.publishedAt), 'MMMM dd, yyyy');
 
+  const tweetText = `Thank you @aperkaz for writing this helpful article.
+  
+  ${websiteUrl}blog/${frontMatter.slug}
+  `;
+
   return (
     <>
       <BlogSeo url={`${websiteUrl}blog/${frontMatter.slug}`} date={date} {...frontMatter} />
@@ -37,20 +42,20 @@ export default function BlogLayout({ frontMatter, children }: PropsWithChildren<
           />
           {children}
         </section>
-        <Flex direction={['column', 'column', 'row']} mb={12}>
+        <Flex direction={['column', 'column', 'row']} mb={12} mt={24}>
           <Avatar size={220} m="auto" mr={['auto', 'auto', 16]} mb={[16, 16, 'auto']} border="3px solid #ededed" />
           <Flex maxW={500} m="auto" ml={['auto', 'auto', 0]} justify="center" direction="column">
             <Box as="h2" fontSize="2xl" fontWeight="400">
-              Hey, my name is{' '}
+              Hi, my name is{' '}
               <Box as="strong" fontWeight="600">
                 Alain
               </Box>{' '}
               👋
             </Box>
             <Box as="h2" fontSize="2xl" fontWeight="400" mt={5}>
-              If you liked this blog post, be sure to follow me on
+              If you liked this, share it on{' '}
               <Link
-                href="https://twitter.com/aperkaz"
+                href={`http://twitter.com/share?text=${tweetText}`}
                 ml={2}
                 mr={1}
                 isExternal
@@ -61,8 +66,8 @@ export default function BlogLayout({ frontMatter, children }: PropsWithChildren<
                 <Box as="span" borderBottom="2px solid currentColor">
                   Twitter
                 </Box>
-              </Link>{' '}
-              for future content. 😄
+              </Link>
+              !
             </Box>
           </Flex>
         </Flex>

@@ -22,7 +22,7 @@ const Navigation = () => {
         <Link display="flex" alignItems="center">
           <Avatar size={44} />
           <Box ml={4} display={['none', 'block']}>
-            <UnderlinedText color="#ff9400" h="3px">
+            <UnderlinedText color="rgb(0, 255, 38)" h="3px">
               <strong>Alain</strong>
             </UnderlinedText>
           </Box>

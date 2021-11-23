@@ -14,6 +14,7 @@ import { MotionBox, MotionFlex } from '../components/motion';
 
 const ANIMATION_DURATION = 0.5;
 
+// TODOWNOW: unify with other colors
 const ORANGE = '#ff9400';
 const PURPLE = '#ff007a';
 const TURQUOISE = '#00e0ff';
@@ -27,7 +28,7 @@ export default function Home() {
 
   return (
     <Flex w="100%" direction="column" align="center">
-      <Flex direction={['column', 'column', 'row']}>
+      <Flex direction={['column', 'column', 'row']} alignContent="center">
         <MotionBox
           opacity="0"
           initial={{
@@ -47,6 +48,8 @@ export default function Home() {
           <Avatar size={220} border="3px solid #ededed" />
         </MotionBox>
         <MotionFlex
+          // mt={40}
+          // mb={40}
           ml={['auto', 'auto', 16]}
           maxW="500px"
           opacity="0"
@@ -78,7 +81,7 @@ export default function Home() {
             </Box>
           </Box>
           {/* TODONOW: move this as part of a icon-heavy section */}
-          <Box as="h2" fontSize="2xl" fontWeight="400" mt={10}>
+          {/* <Box as="h2" fontSize="2xl" fontWeight="400" mt={10}>
             Proficient in{' '}
             <Box as="strong" fontWeight="600">
               React, Node.js, and TypeScript.
@@ -109,7 +112,7 @@ export default function Home() {
               </Box>
               .
             </Link>
-          </Box>
+          </Box> */}
         </MotionFlex>
       </Flex>
       <MotionBox
@@ -263,7 +266,8 @@ export default function Home() {
           },
         }}
       >
-        <Flex mt={20} w="100%" align="left" direction="column">
+        {/* TODONOW: add back */}
+        {/* <Flex mt={20} w="100%" align="left" direction="column">
           <Header id="work story" underlineColor={TURQUOISE}>
             Work story
           </Header>
@@ -327,7 +331,7 @@ export default function Home() {
             />
             <Divider my={10} />
           </Box>
-        </Flex>
+        </Flex> */}
       </MotionFlex>
 
       <Flex mt={20} w="100%" align="left" direction="column">

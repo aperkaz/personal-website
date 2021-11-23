@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 
+// TODONOW: remove this
 class TodoStore {
   email = '';
   error = false;
