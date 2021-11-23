@@ -6,7 +6,7 @@ interface Props extends BoxProps {
 }
 
 const Avatar = ({ size, border, ...boxProps }: Props) => (
-  <Box sx={{ img: { borderRadius: '42% 58% 70% 30% / 70% 60% 40% 30%', border } }} {...boxProps}>
+  <Box sx={{ img: { borderRadius: '50%', border } }} {...boxProps}>
     <Image loading="eager" src="/images/avatar.jpg" width={size} height={size} alt="Alain Perkaz" />
   </Box>
 );

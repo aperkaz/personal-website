@@ -9,7 +9,7 @@ interface Props {
 const UnderlinedText = (props: PropsWithChildren<Props>) => (
   <Box as="span" display="inline-block" position="relative">
     {props.children}
-    <Box as="span" display="block" position="absolute" bg={props.color} w={'100%'} h={props.h || '4px'} bottom={0} />
+    <Box as="span" display="block" position="absolute" bg={props.color} w={'100%'} h={props.h || '3px'} bottom={0} />
   </Box>
 );
 export default UnderlinedText;

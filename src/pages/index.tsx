@@ -1,21 +1,10 @@
-import {
-  Badge,
-  Box,
-  Divider,
-  Flex,
-  Link,
-  useColorMode,
-  useColorModeValue,
-  Text,
-  Image as ChakraImage,
-} from '@chakra-ui/react';
+import { Box, Divider, Flex, Link, useColorMode, useColorModeValue, Image as ChakraImage } from '@chakra-ui/react';
 import Image from 'next/image';
 import { useState } from 'react';
-import { FaGithub, FaTwitter } from 'react-icons/fa';
+import { FaTwitter, FaFreeCodeCamp } from 'react-icons/fa';
+
 import Header from '../components/header';
 import Paragraph from '../components/paragraph';
-import TrueQLogo from '../style/logos/trueq-logo';
-import ProjectDescription from '../components/project-description';
 import CVDescription from '../components/cv-description';
 import UntisLogo from '../style/logos/untis-logo';
 import CatalystsLogo from '../style/logos/catalysts-logo';
@@ -29,7 +18,7 @@ const ORANGE = '#ff9400';
 const PURPLE = '#ff007a';
 const TURQUOISE = '#00e0ff';
 const GREEN = '#38ff00';
-
+// TODONOW: add effect to image from https://gatsby-simplefolio.netlify.app/
 export default function Home() {
   const { colorMode } = useColorMode();
   const [showCV, setShowCV] = useState(false);
@@ -89,19 +78,29 @@ export default function Home() {
             </Box>
           </Box>
           <Box as="h2" fontSize="2xl" fontWeight="400" mt={10}>
-            I work with React, Node.js, TypeScript and ocasinally rant on
+            Preficient in{' '}
+            <Box as="strong" fontWeight="600">
+              React, Node.js, and TypeScript.
+            </Box>{' '}
+            <br />I ocasinally write for
             <Link
               href="https://twitter.com/aperkaz"
               ml={2}
               mr={1}
               isExternal
-              whiteSpace="nowrap"
               _hover={{ textDecor: 'none', color: '#1fa1f1' }}
             >
-              <Box display="inline-block" as={FaTwitter} mb="4px" color="#1fa1f1" />{' '}
-              <Box as="span" borderBottom="2px solid currentColor">
-                Twitter
-              </Box>
+              FreeCodeCamp{' '}
+            </Link>
+            and
+            <Link
+              href="https://twitter.com/aperkaz"
+              ml={2}
+              mr={1}
+              isExternal
+              _hover={{ textDecor: 'none', color: '#1fa1f1' }}
+            >
+              LogRocket.
             </Link>
           </Box>
         </MotionFlex>
@@ -121,7 +120,7 @@ export default function Home() {
           },
         }}
       ></MotionBox>
-      <MotionFlex
+      {/* <MotionFlex
         mt={[6, 12]}
         w="100%"
         align="left"
@@ -241,18 +240,12 @@ export default function Home() {
           />
           <Divider my={10} />
         </Box>
-      </MotionFlex>
+      </MotionFlex> */}
       <Flex mt={20} w="100%" align="left" direction="column">
-        <Header id="cv" underlineColor={TURQUOISE} emoji="✌️">
-          <Box as="span" onMouseEnter={() => setShowCV(true)} onMouseLeave={() => setShowCV(false)}>
-            {showCV ? 'Curriculum Vitae' : 'CV'}
-          </Box>
+        <Header id="cv" underlineColor={TURQUOISE}>
+          CV
         </Header>
-        <Paragraph>
-          After finishing the technical high school I&apos;ve decided to directly start working in software development
-          professionally. I knew that this was my passion and as I was already programming in my freetime, I really
-          wanted to do this on a daily basis and make a living from it.
-        </Paragraph>
+        <Paragraph>TODONOW:</Paragraph>
         <Box px={[4, 8, 12]}>
           <Divider my={10} />
           <CVDescription
@@ -314,31 +307,24 @@ export default function Home() {
         </Box>
       </Flex>
       <Flex mt={20} w="100%" align="left" direction="column">
-        <Header id="contact" underlineColor={GREEN} emoji="📨">
+        <Header id="contact" underlineColor={GREEN}>
           Contact
         </Header>
         <Paragraph>
-          Do you have any questions or would you like to work together with me on a project? Don&apos;t hesitate to
-          write me a{' '}
-          <Link
-            color={linkColor}
-            href="https://twitter.com/messages/compose?recipient_id=798465058061881344"
-            isExternal
-          >
-            DM on Twitter
-          </Link>{' '}
-          or{' '}
-          <Link color={linkColor} href="mailto:domi.sumer@gmail.com" isExternal>
-            send me a mail
+          Do you want to{' '}
+          <Box as="strong" fontWeight="600">
+            work together
+          </Box>{' '}
+          or talk about{' '}
+          <Box as="strong" fontWeight="600">
+            frontend development
+          </Box>
+          ?
+          <br /> Feel free to{' '}
+          <Link color={linkColor} href="mailto:alainperkaz@gmail.com" isExternal>
+            send me an email
           </Link>
           .
-        </Paragraph>
-        <Paragraph>
-          You can also check out my profile on{' '}
-          <Link href="https://github.com/dsumer" ml={1} isExternal>
-            <Box display="inline-block" as={FaGithub} mb="4px" color={colorMode === 'dark' ? 'white' : 'black'} />{' '}
-            GitHub
-          </Link>
         </Paragraph>
       </Flex>
     </Flex>

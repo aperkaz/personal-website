@@ -10,7 +10,7 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react';
 import ColorModeSwitcher from './color-mode-switcher';
-import { FaTwitter } from 'react-icons/fa';
+import { FaTwitter, FaGithub } from 'react-icons/fa';
 import UnderlinedText from './underlined-text';
 import Avatar from './avatar';
 
@@ -30,17 +30,6 @@ const Navigation = () => {
       </NextLink>
       <Box flexGrow={1} />
       <Box>
-        <Link href="https://seriouscode.io" _hover={undefined}>
-          <Button
-            colorScheme="green"
-            data-splitbee-event="ContactButton"
-            data-splitbee-event-type="navigation"
-            mr={[1, 2]}
-            size={buttonSize}
-          >
-            Hire me
-          </Button>
-        </Link>
         <NextLink href="/blog">
           <Link _hover={undefined}>
             <Button variant="nav" size={buttonSize}>
@@ -61,6 +50,16 @@ const Navigation = () => {
             color="#1fa1f1"
             icon={<FaTwitter />}
             aria-label="Welcome to my Twitter profile!"
+          />
+        </Link>
+        <Link href="https://github.com/aperkaz" isExternal>
+          <IconButton
+            size="md"
+            fontSize="lg"
+            variant="nav"
+            color="#1fa1f1"
+            icon={<FaGithub />}
+            aria-label="Welcome to my GitHub profile!"
           />
         </Link>
         <ColorModeSwitcher />

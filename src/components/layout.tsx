@@ -13,7 +13,7 @@ const Wrapper = chakra(Flex, {
   },
 });
 
-const title = 'Alain Perkaz - Frontend Engineer';
+const title = 'Alain - FE Engineer';
 const description = "Hey! My name is Alain and I'm a Freelance Frontend Engineer.";
 
 const Layout = (props: PropsWithChildren<unknown>) => {
@@ -47,21 +47,11 @@ const Layout = (props: PropsWithChildren<unknown>) => {
       </Box>
       <Wrapper pt={8}>{props.children}</Wrapper>
       <Box mt={16} mb={[8, 8, 6]} textAlign="center">
-        Website built with
-        <Box
-          as="span"
-          mx="2"
-          _before={{
-            cursor: 'default',
-            content: '"❤️"',
-          }}
-          _hover={{
-            _before: {
-              content: '"☕️"',
-            },
-          }}
-        />
-        in Austria{'  '}🇦🇹
+        Built with{' '}
+        <Box as="strong" fontWeight="600">
+          care
+        </Box>{' '}
+        using Next.js
       </Box>
     </>
   );

@@ -17,9 +17,6 @@ const colors = [BLUE, GREEN, PURPLE, ORANGE, TURQUOISE, RED];
 const BlogOverview = ({ groups }: { groups: GroupedBlogPosts[] }) => {
   return (
     <Flex direction="column" w="100%">
-      <Text as="h1" fontSize="3xl" textAlign="center" mb={16}>
-        Hey, glad you&apos;re stopping by! 🙇‍♂️
-      </Text>
       <Box>
         {groups.map((g) => (
           <Box key={g.month} m="auto" w={['100%', '100%', '85%']} mb={14}>
@@ -29,8 +26,7 @@ const BlogOverview = ({ groups }: { groups: GroupedBlogPosts[] }) => {
               display="inline-block"
               mb={4}
               ml={[0, 2, 4]}
-              borderBottom="6px solid"
-              borderColor={colors[g.monthNumber % colors.length]}
+              borderBottom="4px solid"
             >
               {g.month}
             </Text>
