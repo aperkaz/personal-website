@@ -66,7 +66,8 @@ const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...pr
               borderRadius: '16px',
             }}
           >
-            FreeCodeCamp <Box display="inline-block" as={FaFreeCodeCamp} mb="2px" _hover={{ color: '#3bf11f' }} />
+            LogRocket 🚀
+            {/* <Box display="inline-block" as={FaFreeCodeCamp} mb="2px" _hover={{ color: '#3bf11f' }} /> */}
           </Link>
         )}
       </Box>
