@@ -1,5 +1,7 @@
 import Image from 'next/image';
-import { Box, BoxProps } from '@chakra-ui/react';
+import { Box, BoxProps, Link } from '@chakra-ui/react';
+import { FaFreeCodeCamp } from 'react-icons/fa';
+import { IoMdRocket } from 'react-icons/io';
 
 export interface BannerComponent {
   props: BoxProps;
@@ -16,9 +18,10 @@ interface Props extends BoxProps {
   banner: string;
   bannerBg: string;
   bannerComponent: BannerComponent;
+  externalUrl?: string;
 }
 
-const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, ...props }: Props) => (
+const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...props }: Props) => (
   <Box
     sx={{
       img: {
@@ -44,7 +47,32 @@ const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, ...props }: Props)
         </Box>
       </Box>
     )}
-    {banner && <Image src={banner} width="800" height="300" alt={alt} />}
+    {banner && (
+      <Box w="100%" pos="relative" style={{ fontWeight: 'bold' }}>
+        <Image src={banner} width="800" height="300" alt={alt} />
+        {externalUrl && (
+          <Link
+            href={externalUrl}
+            ml={2}
+            mr={1}
+            isExternal
+            whiteSpace="nowrap"
+            _hover={{ color: '#3bf11f' }}
+            style={{
+              position: 'absolute',
+              right: '20px',
+              bottom: '20px',
+              background: 'grey',
+              padding: '0.5rem 1rem',
+              borderRadius: '16px',
+            }}
+          >
+            LogRocket
+            <Box display="inline-block" as={IoMdRocket} mb="2px" _hover={{ color: '#3bf11f' }} />
+          </Link>
+        )}
+      </Box>
+    )}
   </Box>
 );
 export default BlogBanner;
