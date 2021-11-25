@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Box, BoxProps, Link } from '@chakra-ui/react';
 import { FaFreeCodeCamp } from 'react-icons/fa';
+import { IoMdRocket } from 'react-icons/io';
 
 export interface BannerComponent {
   props: BoxProps;
@@ -66,8 +67,8 @@ const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...pr
               borderRadius: '16px',
             }}
           >
-            LogRocket 🚀
-            {/* <Box display="inline-block" as={FaFreeCodeCamp} mb="2px" _hover={{ color: '#3bf11f' }} /> */}
+            LogRocket
+            <Box display="inline-block" as={IoMdRocket} mb="2px" _hover={{ color: '#3bf11f' }} />
           </Link>
         )}
       </Box>
