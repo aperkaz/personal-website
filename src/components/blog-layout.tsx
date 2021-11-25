@@ -39,7 +39,7 @@ export default function BlogLayout({ frontMatter, children }: PropsWithChildren<
             banner={frontMatter.banner}
             bannerBg={frontMatter.bannerBg}
             bannerComponent={frontMatter.bannerComponent}
-            freeCodeCamp={frontMatter.freeCodeCamp}
+            externalUrl={frontMatter.externalUrl}
           />
           {children}
         </section>

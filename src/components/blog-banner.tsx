@@ -17,10 +17,10 @@ interface Props extends BoxProps {
   banner: string;
   bannerBg: string;
   bannerComponent: BannerComponent;
-  freeCodeCamp?: string;
+  externalUrl?: string;
 }
 
-const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, freeCodeCamp, ...props }: Props) => (
+const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...props }: Props) => (
   <Box
     sx={{
       img: {
@@ -49,9 +49,9 @@ const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, freeCodeCamp, ...p
     {banner && (
       <Box w="100%" pos="relative" style={{ fontWeight: 'bold' }}>
         <Image src={banner} width="800" height="300" alt={alt} />
-        {freeCodeCamp && (
+        {externalUrl && (
           <Link
-            href={freeCodeCamp}
+            href={externalUrl}
             ml={2}
             mr={1}
             isExternal

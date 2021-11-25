@@ -12,7 +12,7 @@ interface Props {
   summary: string;
   publishedAt: string;
   readingTime: any;
-  freeCodeCamp?: string;
+  externalUrl?: string;
 }
 const BlogCard = ({
   slug,
@@ -23,7 +23,7 @@ const BlogCard = ({
   summary,
   publishedAt,
   readingTime,
-  freeCodeCamp,
+  externalUrl,
 }: Props) => (
   <Box
     as="article"
@@ -38,7 +38,7 @@ const BlogCard = ({
         banner={banner}
         bannerBg={bannerBg}
         bannerComponent={bannerComponent}
-        freeCodeCamp={freeCodeCamp}
+        externalUrl={externalUrl}
       />
       <Text as="h2" fontSize="1.8rem">
         {title}
