@@ -12,8 +12,19 @@ interface Props {
   summary: string;
   publishedAt: string;
   readingTime: any;
+  freeCodeCamp?: string;
 }
-const BlogCard = ({ slug, banner, bannerBg, bannerComponent, title, summary, publishedAt, readingTime }: Props) => (
+const BlogCard = ({
+  slug,
+  banner,
+  bannerBg,
+  bannerComponent,
+  title,
+  summary,
+  publishedAt,
+  readingTime,
+  freeCodeCamp,
+}: Props) => (
   <Box
     as="article"
     w="100%"
@@ -21,7 +32,14 @@ const BlogCard = ({ slug, banner, bannerBg, bannerComponent, title, summary, pub
     _hover={{ bg: useColorModeValue('blackAlpha.100', 'whiteAlpha.100'), borderRadius: '10px' }}
   >
     <Box pointerEvents="none" p={[0, 2, 4]} borderRadius="5px">
-      <BlogBanner mb="3" alt={title} banner={banner} bannerBg={bannerBg} bannerComponent={bannerComponent} />
+      <BlogBanner
+        mb="3"
+        alt={title}
+        banner={banner}
+        bannerBg={bannerBg}
+        bannerComponent={bannerComponent}
+        freeCodeCamp={freeCodeCamp}
+      />
       <Text as="h2" fontSize="1.8rem">
         {title}
       </Text>
