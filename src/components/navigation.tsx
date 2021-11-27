@@ -10,7 +10,7 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react';
 import ColorModeSwitcher from './color-mode-switcher';
-import { FaTwitter, FaGithub } from 'react-icons/fa';
+import { FaTwitter, FaGithub, FaLinkedin } from 'react-icons/fa';
 import UnderlinedText from './underlined-text';
 import Avatar from './avatar';
 
@@ -60,6 +60,16 @@ const Navigation = () => {
             color="#1fa1f1"
             icon={<FaGithub />}
             aria-label="Welcome to my GitHub profile!"
+          />
+        </Link>
+        <Link href="https://www.linkedin.com/in/alain-perkaz-ortiz-774286114/" isExternal>
+          <IconButton
+            size="md"
+            fontSize="lg"
+            variant="nav"
+            color="#1fa1f1"
+            icon={<FaLinkedin />}
+            aria-label="Welcome to my LinkedIn profile!"
           />
         </Link>
         <ColorModeSwitcher />

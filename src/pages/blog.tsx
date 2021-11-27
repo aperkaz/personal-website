@@ -5,16 +5,6 @@ import { Fragment } from 'react';
 import BlogCard from '../components/blog-card';
 import { getAllFilesFrontMatter } from '../utils/mdx';
 
-// TODONOW: extract this to theme!
-const ORANGE = '#ff940070';
-const PURPLE = '#ff007a70';
-const TURQUOISE = '#00e0ff70';
-const GREEN = '#38ff0070';
-const BLUE = '#0060ff70';
-const RED = '#ff00008f';
-
-const colors = [BLUE, GREEN, PURPLE, ORANGE, TURQUOISE, RED];
-
 const BlogOverview = ({ groups }: { groups: GroupedBlogPosts[] }) => {
   return (
     <Flex direction="column" w="100%">

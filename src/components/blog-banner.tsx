@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { Box, BoxProps, Link } from '@chakra-ui/react';
-import { FaFreeCodeCamp } from 'react-icons/fa';
 import { IoMdRocket } from 'react-icons/io';
+import { FaFreeCodeCamp, FaMedium } from 'react-icons/fa';
 
 export interface BannerComponent {
   props: BoxProps;
@@ -16,12 +16,15 @@ export interface BannerComponent {
 interface Props extends BoxProps {
   alt: string;
   banner: string;
-  bannerBg: string;
   bannerComponent: BannerComponent;
   externalUrl?: string;
 }
 
-const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...props }: Props) => (
+const isMediumUrl = (url: string) => url.includes('javascript.plainenglish.io');
+const isLogRocketUrl = (url: string) => url.includes('blog.logrocket.com');
+const isFreeCodeCampUrl = (url: string) => url.includes('freecodecamp.org');
+
+const BlogBanner = ({ alt, banner, bannerComponent, externalUrl, ...props }: Props) => (
   <Box
     sx={{
       img: {
@@ -31,7 +34,6 @@ const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...pr
     m="auto"
     mb={16}
     borderRadius="10px"
-    bg={bannerBg}
     maxW="800px"
     maxH="300px"
     {...props}
@@ -57,7 +59,7 @@ const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...pr
             mr={1}
             isExternal
             whiteSpace="nowrap"
-            _hover={{ color: '#3bf11f' }}
+            _hover={{ color: '#0050b9' }}
             style={{
               position: 'absolute',
               right: '20px',
@@ -67,8 +69,21 @@ const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...pr
               borderRadius: '16px',
             }}
           >
-            LogRocket
-            <Box display="inline-block" as={IoMdRocket} mb="2px" _hover={{ color: '#3bf11f' }} />
+            {isLogRocketUrl(externalUrl) ? (
+              <>
+                LogRocket <Box display="inline-block" as={IoMdRocket} mb="2px" />
+              </>
+            ) : isMediumUrl(externalUrl) ? (
+              <>
+                Medium <Box display="inline-block" as={FaMedium} mb="2px" />
+              </>
+            ) : isFreeCodeCampUrl(externalUrl) ? (
+              <>
+                freeCodeCamp <Box display="inline-block" as={FaFreeCodeCamp} mb="2px" />
+              </>
+            ) : (
+              <>external</>
+            )}
           </Link>
         )}
       </Box>

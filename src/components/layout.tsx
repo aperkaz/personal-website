@@ -14,7 +14,7 @@ const Wrapper = chakra(Flex, {
 });
 
 const title = 'Alain - FE Engineer';
-const description = "Hey! My name is Alain and I'm a Freelance Frontend Engineer.";
+const description = "Hey! My name is Alain, and I'm a Freelance Frontend Engineer.";
 
 const Layout = (props: PropsWithChildren<unknown>) => {
   const headerBg = useColorModeValue('gray.100', 'gray.700');
