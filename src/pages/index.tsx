@@ -12,7 +12,7 @@ import { MotionBox, MotionFlex } from '../components/motion';
 
 const ANIMATION_DURATION = 0.5;
 
-// TODNOW: add analytics
+// TODONOW: add nice image rendering (with footers)
 
 export default function Home() {
   const linkColor = useColorModeValue('blue.500', 'blue.400');
@@ -145,7 +145,7 @@ export default function Home() {
         <Flex w="100%" align="left" direction="column">
           <Header id="work story">The tech stack 🚀</Header>
           <Paragraph>
-            I am most comfortable writting <b>TypeScript</b>, for the browser, native apps, and backend.
+            I am most comfortable writing <b>TypeScript</b> for the browser, native apps, and backend.
           </Paragraph>
           <Paragraph>
             In the frontend, I prefer <b>React.js</b> + the state management library of the week.
