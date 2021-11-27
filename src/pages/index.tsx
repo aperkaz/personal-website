@@ -1,4 +1,4 @@
-import { Box, Flex, Link, useColorMode, useColorModeValue, Tooltip } from '@chakra-ui/react';
+import { Box, Flex, Link, useColorModeValue, Tooltip } from '@chakra-ui/react';
 import { FaReact, FaNodeJs } from 'react-icons/fa';
 import { SiTypescript, SiStorybook, SiElectron } from 'react-icons/si';
 
@@ -9,15 +9,12 @@ import { MotionBox, MotionFlex } from '../components/motion';
 
 const ANIMATION_DURATION = 0.5;
 
-// TODOWNOW: unify with other colors
-const ORANGE = '#ff9400';
-const PURPLE = '#ff007a';
-const TURQUOISE = '#00e0ff';
-const GREEN = '#38ff00';
+// TODNOW: add analytics
+
+// TODONOW: purge unused packages
+
 // TODONOW: add effect to image from https://gatsby-simplefolio.netlify.app/
 export default function Home() {
-  const { colorMode } = useColorMode();
-
   const linkColor = useColorModeValue('blue.500', 'blue.400');
 
   return (

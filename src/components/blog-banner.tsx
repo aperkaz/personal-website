@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import { Box, BoxProps, Link } from '@chakra-ui/react';
-import { FaFreeCodeCamp } from 'react-icons/fa';
 import { IoMdRocket } from 'react-icons/io';
 
 export interface BannerComponent {
