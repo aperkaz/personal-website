@@ -34,6 +34,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-icons": "^3.11.0",
+    "react-tilt": "^0.1.4",
     "react-tweet-embed": "^1.2.2",
     "reading-time": "^1.2.1",
     "rehype": "^11.0.0",

@@ -1,6 +1,9 @@
 import { Box, Flex, Link, useColorModeValue, Tooltip } from '@chakra-ui/react';
 import { FaReact, FaNodeJs } from 'react-icons/fa';
 import { SiTypescript, SiStorybook, SiElectron } from 'react-icons/si';
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore
+import Tilt from 'react-tilt';
 
 import Header from '../components/header';
 import Paragraph from '../components/paragraph';
@@ -11,9 +14,6 @@ const ANIMATION_DURATION = 0.5;
 
 // TODNOW: add analytics
 
-// TODONOW: purge unused packages
-
-// TODONOW: add effect to image from https://gatsby-simplefolio.netlify.app/
 export default function Home() {
   const linkColor = useColorModeValue('blue.500', 'blue.400');
 
@@ -36,7 +36,21 @@ export default function Home() {
           m="auto"
           mb={[16, 16, 'auto']}
         >
-          <Avatar size={220} border="3px solid #ededed" />
+          <Tilt
+            options={{
+              reverse: false,
+              max: 20,
+              perspective: 1000,
+              scale: 1,
+              speed: 300,
+              transition: true,
+              axis: null,
+              reset: true,
+              easing: 'cubic-bezier(.03,.98,.52,.99)',
+            }}
+          >
+            <Avatar size={220} border="3px solid #ededed" />
+          </Tilt>
         </MotionBox>
         <MotionFlex
           ml={['auto', 'auto', 16]}
@@ -167,7 +181,7 @@ export default function Home() {
       </MotionFlex>
 
       <MotionFlex
-        mt={[6, 12]}
+        mt={[6, 10]}
         w="100%"
         align="left"
         direction="column"
