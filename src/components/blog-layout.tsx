@@ -37,7 +37,6 @@ export default function BlogLayout({ frontMatter, children }: PropsWithChildren<
           <BlogBanner
             alt={frontMatter.title}
             banner={frontMatter.banner}
-            bannerBg={frontMatter.bannerBg}
             bannerComponent={frontMatter.bannerComponent}
             externalUrl={frontMatter.externalUrl}
           />

@@ -6,7 +6,6 @@ import BlogBanner, { BannerComponent } from './blog-banner';
 interface Props {
   slug: string;
   banner: string;
-  bannerBg: string;
   bannerComponent: BannerComponent;
   title: string;
   summary: string;
@@ -14,17 +13,7 @@ interface Props {
   readingTime: any;
   externalUrl?: string;
 }
-const BlogCard = ({
-  slug,
-  banner,
-  bannerBg,
-  bannerComponent,
-  title,
-  summary,
-  publishedAt,
-  readingTime,
-  externalUrl,
-}: Props) => (
+const BlogCard = ({ slug, banner, bannerComponent, title, summary, publishedAt, readingTime, externalUrl }: Props) => (
   <Box
     as="article"
     w="100%"
@@ -32,14 +21,7 @@ const BlogCard = ({
     _hover={{ bg: useColorModeValue('blackAlpha.100', 'whiteAlpha.100'), borderRadius: '10px' }}
   >
     <Box pointerEvents="none" p={[0, 2, 4]} borderRadius="5px">
-      <BlogBanner
-        mb="3"
-        alt={title}
-        banner={banner}
-        bannerBg={bannerBg}
-        bannerComponent={bannerComponent}
-        externalUrl={externalUrl}
-      />
+      <BlogBanner mb="3" alt={title} banner={banner} bannerComponent={bannerComponent} externalUrl={externalUrl} />
       <Text as="h2" fontSize="1.8rem">
         {title}
       </Text>

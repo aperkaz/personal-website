@@ -15,12 +15,11 @@ export interface BannerComponent {
 interface Props extends BoxProps {
   alt: string;
   banner: string;
-  bannerBg: string;
   bannerComponent: BannerComponent;
   externalUrl?: string;
 }
 
-const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...props }: Props) => (
+const BlogBanner = ({ alt, banner, bannerComponent, externalUrl, ...props }: Props) => (
   <Box
     sx={{
       img: {
@@ -30,7 +29,6 @@ const BlogBanner = ({ alt, banner, bannerBg, bannerComponent, externalUrl, ...pr
     m="auto"
     mb={16}
     borderRadius="10px"
-    bg={bannerBg}
     maxW="800px"
     maxH="300px"
     {...props}
