@@ -79,7 +79,7 @@ const BlogBanner = ({ alt, banner, bannerComponent, externalUrl, ...props }: Pro
               </>
             ) : isFreeCodeCampUrl(externalUrl) ? (
               <>
-                freeCodeCamp <Box display="inline-block" as={FaFreeCodeCamp} mb="2px" />
+                FreeCodeCamp <Box display="inline-block" as={FaFreeCodeCamp} mb="2px" />
               </>
             ) : (
               <>external</>
