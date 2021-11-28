@@ -12,8 +12,6 @@ import { MotionBox, MotionFlex } from '../components/motion';
 
 const ANIMATION_DURATION = 0.5;
 
-// TODONOW: add nice image rendering (with footers)
-
 export default function Home() {
   const linkColor = useColorModeValue('blue.500', 'blue.400');
 
