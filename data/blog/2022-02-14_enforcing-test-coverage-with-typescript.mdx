@@ -1,0 +1,34 @@
+---
+title: 'Enforcing test coverage with TypeScript'
+publishedAt: '2022-02-14'
+summary: 'Checking API test coverage at compile-time.'
+banner: '/images/blog/2022-02-14_enforcing-test-coverage-with-typescript/banner.png'
+# TODO: add when needed
+# externalUrl: 'https://www.freecodecamp.org/news/serverless-online-payments/'
+---
+
+Over this last years, I have had the change of working with TypeScript (TS) in multiple different projects and environments (Electron, React Native, the browser, and the server). In the very begining, it was a nuance to deal with the TS compiler's endless warnings, but over time I learned to love the peace of mind that comes with it.
+
+Small changes such as typing an object can save you and your team endless `TypeError: Cannot read properties of undefined` errors in production. Typed functions and service interfaces bring great benefits too, by making the contracts between your code **explicit** and surfacing errors at compile-time. That said, these benefits are known to developers with TypeScript experience.
+
+In this post well explore the potential of TypeScript, in the context of testing. Types that increase the confidence over production code are great, but what if we could leverage those same types to enforce a given testing strategy? 🤔
+
+In the following sections we will explore that question, for the real-work use case of testing an Express Rest API.
+
+👇 TODONOW
+
+[DESCRIBE THE CHALLENGES OF TESTING (APIs)]
+-> link to the questions above
+-> challenges of defining & enforcing a given test approach
+
+[PROPOSAL]
+Overcome the challenges by using TS for keeping track of what is the test surface to cover.
+
+[IMPLEMENTATION]
+As a starting point, well use [this](https://github.com/aperkaz/express-open-api) Express + OpenAPI project.
+THe projects setup and reasoning behind it is coverer by [this post](https://www.alainperkaz.com/blog/2021-04-02_better-apis-with-openapi).
+
+[CONCLUSSION]
+TS is very powerfull, beyond the type-checking of functions or variables.
+Once the core parts of a system are properly typed, such as the service API in this case, its usefullness grows considerably.
+Embracing TS in all aspects of a projectmay take time or not be completely feasible, but I would recommend trying to type at least the core parts, considering the potential improvement of developer experience.
