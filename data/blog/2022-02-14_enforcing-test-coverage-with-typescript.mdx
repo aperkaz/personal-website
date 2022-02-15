@@ -11,15 +11,23 @@ Over this last years, I have had the change of working with TypeScript (TS) in m
 
 Small changes such as typing an object can save you and your team endless `TypeError: Cannot read properties of undefined` errors in production. Typed functions and service interfaces bring great benefits too, by making the contracts between your code **explicit** and surfacing errors at compile-time. That said, these benefits are known to developers with TypeScript experience.
 
-In this post well explore the potential of TypeScript, in the context of testing. Types that increase the confidence over production code are great, but what if we could leverage those same types to enforce a given testing strategy? 🤔
+In this post well look into the potential of TypeScript, in the context of testing. Types that increase the confidence over production code are great, but what if we could leverage those same types to enforce a testing strategy? 🤔
 
-In the following sections we will explore that question, for the real-work use case of testing an Express Rest API.
+In the following sections we will explore that question, in the context of testing an Express Rest API. But before that, lets cover the topic of testing strategies and consistency!
 
-👇 TODONOW
+# Testing strategy and consistency
 
-[DESCRIBE THE CHALLENGES OF TESTING (APIs)]
--> link to the questions above
--> challenges of defining & enforcing a given test approach
+Choosing an appropiate testing strategy is no easy task, as it will wildly vary depending on the size, complexity and tech stack of the project. Once the team settles on a testing strategy, keeping it consistent over time is **key**. A well-thought strategy wont be effective if new-features dont follow it.
+
+Code-coverage can be a usefull tool for ensuring that a project's overall code stays covered by tests. That said, it can yeld false positives for startegies such as: all the API endpoints should be tested. After adding a new API endpoint, it may occur that the code coverage still stays above the threshold, silencing the fact that the new endpoint is untested (untested endpoints are never a good idea 💀).
+
+Test correctness is often enforced by Continuous Integration pipelines, while consistency is left for the individual contributors and the pull-request reviewers to judge. Over time, it can be challenging to keep this consistency, as the number of developers and pressure to delivery increases.
+
+On the next section we will explore how to automatically enforce consistecy, so that it is easy to be consistent and hard to break 😉
+
+# Automatic test consistency with TypeScript
+
+TODO
 
 [PROPOSAL]
 Overcome the challenges by using TS for keeping track of what is the test surface to cover.
