@@ -1,5 +1,5 @@
 ---
-title: 'Enforcing test coverage with TypeScript'
+title: 'Enforcing test strategies with TypeScript'
 publishedAt: '2022-02-14'
 summary: 'Checking API test coverage at compile-time.'
 banner: '/images/blog/2022-02-14_enforcing-test-coverage-with-typescript/banner.png'
@@ -7,36 +7,46 @@ banner: '/images/blog/2022-02-14_enforcing-test-coverage-with-typescript/banner.
 # externalUrl: 'https://www.freecodecamp.org/news/serverless-online-payments/'
 ---
 
-Over this last years, I have had the change of working with TypeScript (TS) in multiple different projects and environments (Electron, React Native, the browser, and the server). In the very begining, it was a nuance to deal with the TS compiler's endless warnings, but over time I learned to love the peace of mind that comes with it.
+Over the last years, I have had the change of working with TypeScript (TS) in different projects and environments (Electron, React Native, the browser, and the server). In the very begining, it was a nuance to deal with the TS compiler's endless warnings, but over time I learned to love the peace of mind that comes with it.
 
-Small changes such as typing an object can save you and your team endless `TypeError: Cannot read properties of undefined` errors in production. Typed functions and service interfaces bring great benefits too, by making the contracts between your code **explicit** and surfacing errors at compile-time. That said, these benefits are known to developers with TypeScript experience.
+Small changes such as typing an object can save you and your team endless `TypeError: Cannot read properties of undefined` errors in production. Typed functions and service interfaces bring great benefits too, by making the contracts between your code **explicit** and surfacing errors at compile-time. That said, these benefits are a given for most TypeScript developers.
 
-In this post well look into the potential of TypeScript, in the context of testing. Types that increase the confidence over production code are great, but what if we could leverage those same types to enforce a testing strategy? 🤔
+In this post well tap into the potential of TypeScript, in the context of testing. Types that increase the confidence over production code are great, but what if we could leverage those same types to enforce a testing strategy? 🤔
 
-In the following sections we will explore that question, in the context of testing an Express Rest API. But before that, lets cover the topic of testing strategies and consistency!
+In the following sections we will explore that question, while testing an Express Rest API. But before that, lets briefly discuss the importance of testing strategies and consistency!
 
-# Testing strategy and consistency
+# Testing strategies and consistency
 
 Choosing an appropiate testing strategy is no easy task, as it will wildly vary depending on the size, complexity and tech stack of the project. Once the team settles on a testing strategy, keeping it consistent over time is **key**. A well-thought strategy wont be effective if new-features dont follow it.
 
-Code-coverage can be a usefull tool for ensuring that a project's overall code stays covered by tests. That said, it can yeld false positives for startegies such as: all the API endpoints should be tested. After adding a new API endpoint, it may occur that the code coverage still stays above the threshold, silencing the fact that the new endpoint is untested (untested endpoints are never a good idea 💀).
+Code-coverage can be a usefull tool for ensuring that a project's code stays covered by tests. That said, it can yeld false positives when used for keeping testing startegies consistent (for example, if we want all of the API endpoints to be tested). After adding a new API endpoint, the code coverage may still be above the defined threshold, silencing the fact that the new endpoint is untested (untested endpoints are never a good idea 💀).
 
 Test correctness is often enforced by Continuous Integration pipelines, while consistency is left for the individual contributors and the pull-request reviewers to judge. Over time, it can be challenging to keep this consistency, as the number of developers and pressure to delivery increases.
 
-On the next section we will explore how to automatically enforce consistecy, so that it is easy to be consistent and hard to break 😉
+On the next section we will explore how to automatically enforce a testing strategy, so that it is easy to be consistent and hard to break it 😉
 
-# Automatic test consistency with TypeScript
+# Enforcing test consistency with TypeScript
 
-TODO
+Now that the importance of a consistent testing strategy is clear, lets look into a practical example of how we can enforce it at compile-time using TypeScript.
 
-[PROPOSAL]
-Overcome the challenges by using TS for keeping track of what is the test surface to cover.
+As a starting point, well use [this](https://github.com/aperkaz/express-open-api) Express.js + [OpenAPI](https://www.openapis.org/) project. If you are curious about the advantages of building an API with standard specifications (OpenAPI), you can read more about it [here](https://www.freecodecamp.org/news/how-to-build-explicit-apis-with-openapi/).
 
-[IMPLEMENTATION]
-As a starting point, well use [this](https://github.com/aperkaz/express-open-api) Express + OpenAPI project.
-THe projects setup and reasoning behind it is coverer by [this post](https://www.alainperkaz.com/blog/2021-04-02_better-apis-with-openapi).
+The testing strategy to enforce will be the following: **all the endpoints and methods in our API must be tested**.
 
-[CONCLUSSION]
-TS is very powerfull, beyond the type-checking of functions or variables.
-Once the core parts of a system are properly typed, such as the service API in this case, its usefullness grows considerably.
-Embracing TS in all aspects of a projectmay take time or not be completely feasible, but I would recommend trying to type at least the core parts, considering the potential improvement of developer experience.
+## IMPLEMENTATION
+
+One of the great advantages of describing you APIs with an standard, is the compatibility of the API definitions with the tooling built for that standard. In the case of OpenAPI (formerly Swagger), there are plenty of tools for automatic [client generation](https://openapi-generator.tech/docs/generators/#client-generators), [documentation generation](https://openapi-generator.tech/docs/generators/#client-generators) and even [TypeScript interface generation](https://github.com/drwpow/openapi-typescript) 🤯
+
+As you may have guessed, well leverage the TS interface generation, so that API changes are available through the generated interfaces, and thus tests can be enforced at compile time. A overview of the architecture looks as follows:
+
+GOAL - IMAGE (API / specification -> autogenerated TS interface -> typed tests (based on the TS interface))
+
+// TODONOW:
+
+# Conclussion
+
+TypeScript is a very powerfull tool, which usefullness expands beyond the type-checking of variables and autocompletion (those are awesome though). Once the core parts of a system are typed (or the types can be generated, as in the example above), its usefullness grows considerably.
+
+// TODONOW:
+
+Embracing TS in all aspects of a project may take time or not be completely feasible, but I would recommend getting types down for the core parts, for enforcing certain testing strategies and improving the developer experience.
