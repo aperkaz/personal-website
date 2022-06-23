@@ -62,7 +62,7 @@ const Navigation = () => {
             aria-label="Welcome to my GitHub profile!"
           />
         </Link>
-        <Link href="https://www.linkedin.com/in/alain-perkaz-ortiz-774286114/" isExternal>
+        <Link href="https://www.linkedin.com/in/alain-perkaz/" isExternal>
           <IconButton
             size="md"
             fontSize="lg"
