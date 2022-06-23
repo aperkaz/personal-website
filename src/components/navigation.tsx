@@ -10,7 +10,7 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react';
 import ColorModeSwitcher from './color-mode-switcher';
-import { FaTwitter, FaGithub, FaLinkedin } from 'react-icons/fa';
+import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import UnderlinedText from './underlined-text';
 import Avatar from './avatar';
 
@@ -42,16 +42,6 @@ const Navigation = () => {
         <Divider orientation="vertical" borderColor={useColorModeValue('gray.400', 'gray.500')} />
       </Center>
       <Box>
-        <Link href="https://twitter.com/aperkaz" isExternal>
-          <IconButton
-            size="md"
-            fontSize="lg"
-            variant="nav"
-            color="#1fa1f1"
-            icon={<FaTwitter />}
-            aria-label="Welcome to my Twitter profile!"
-          />
-        </Link>
         <Link href="https://github.com/aperkaz" isExternal>
           <IconButton
             size="md"
