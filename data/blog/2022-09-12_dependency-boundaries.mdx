@@ -1,8 +1,8 @@
 ---
 title: 'Dependency boundaries in TypeScript'
-publishedAt: '2022-06-15'
+publishedAt: '2022-09-12'
 summary: 'How to keep dependencies under control.'
-banner: '/images/blog/2022-06-15_dependency-boundaries/banner.png'
+banner: '/images/blog/2022-09-12_dependency-boundaries/banner.png'
 # externalUrl: 'https://blog.logrocket.com/handing-date-strings-typescript/'
 ---
 
@@ -40,7 +40,7 @@ This enables breaking up the functionality into modules, which can be organized 
 This module syntax allows for great flexibility, imposing no restrictions on what can be exported or imported from anywhere. The dependency graphs are implicitly defined across the app.
 
 <div style={{ position: 'relative', width: '100%', height: '400px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2022-06-15_dependency-boundaries/image1.png" layout="fill" objectFit="contain" />
+  <Image src="/images/blog/2022-09-12_dependency-boundaries/image1.png" layout="fill" objectFit="contain" />
 </div>
 
 As a project develops, that implicit dependency graph can grow unchecked, leading to some pitfalls.
@@ -78,7 +78,7 @@ The UI does not have access to the business-logic methods in the app, as they ar
 The dependency graph between modules is as follows. Note that the dependency between modules is marked with an arrow, the internal modules are colored grey, and the external packages are blue.
 
 <div style={{ position: 'relative', width: '100%', height: '400px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2022-06-15_dependency-boundaries/image2.png" layout="fill" objectFit="contain" />
+  <Image src="/images/blog/2022-09-12_dependency-boundaries/image2.png" layout="fill" objectFit="contain" />
 </div>
 
 To implement the schema above, we will create three different fenced directories: `math`, `store`, and `ui`. Each directory maps to one of the modules in the schema.
