@@ -1,7 +1,7 @@
 import type { BoxProps } from "@chakra-ui/react";
 import { Box } from "@chakra-ui/react";
 import type { PropsWithChildren } from "react";
-import { UnderlinedText } from "./underlined-text";
+import UnderlinedText from "./underlined-text";
 
 interface Props extends BoxProps {
   underlineColor?: string;
