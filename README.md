@@ -1,6 +1,7 @@
 # personal website - 11ty v8
 
 TODONOW: add css for horizontal scroll on opst code
+TODONOW: deploy to github
 
 Docs on 11ty: https://www.11ty.dev/
 
@@ -12,7 +13,6 @@ Deploy this Eleventy site in just a few clicks on these services:
 
 ### Implementation Notes
 
-- `content/about/index.md` is an example of a content page.
 - `content/blog/` has the blog posts but really they can live in any directory. They need only the `posts` tag to be included in the blog posts [collection](https://www.11ty.dev/docs/collections/).
 - Use the `eleventyNavigation` key (via the [Eleventy Navigation plugin](https://www.11ty.dev/docs/plugins/navigation/)) in your front matter to add a template to the top level site navigation. This is in use on `content/index.njk` and `content/about/index.md`.
 - Content can be in _any template format_ (blog posts needn’t exclusively be markdown, for example). Configure your project’s supported templates in `eleventy.config.js` -> `templateFormats`.

@@ -106,9 +106,6 @@ main :first-child {
 	margin-top: 0;
 }
 
-header {
-	border-bottom: 1px dashed var(--color-gray-20);
-}
 header:after {
 	content: "";
 	display: table;
@@ -164,8 +161,27 @@ header {
 }
 .home-link {
 	font-size: 1em; /* 16px /16 */
-	font-weight: 700;
-	margin-right: 2em;
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
 }
 .home-link:link:not(:hover) {
 	text-decoration: none;
@@ -180,7 +196,7 @@ header {
 }
 .nav-item {
 	display: inline-block;
-	margin-right: 1em;
+	margin-right: 2em;
 }
 .nav-item a[href]:not(:hover) {
 	text-decoration: none;
