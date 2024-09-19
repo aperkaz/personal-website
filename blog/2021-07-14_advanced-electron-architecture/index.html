@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Advanced Electron.js architecture</title>
+		<meta name="description" content="An exploration of different Electron architectures.">
+
+		<link rel="icon" type="image/png" sizes="196x196" href="/eleventy-base-blog/img/favicon-196.png">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Alain Perkaz">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Alain Perkaz">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono,
+		Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono,
+		Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New,
+		Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #c0c0c0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050f;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #c0c0c0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 40em;
+}
+
+/* prevents images from overflowing parent p in posts */
+p img {
+	width: 100%;
+	height: auto; /* Maintain aspect ratio */
+	max-width: 100%; /* Ensure the image doesn't stretch beyond its original size */
+	display: block; /* Remove inline element gap */
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	/* TODONOW: add different font for code */
+	font-family: var(--font-family-monospace);
+	font-size: 0.9rem !important;
+}
+pre:not([class*="language-"]) {
+	margin: 0.5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 2em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	word-spacing: -0.5px;
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: 0.25em;
+	padding-right: 0.5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: 0.1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/eleventy-base-blog/" class="home-link">Alain Perkaz</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/eleventy-base-blog/">Home</a></li>
+					<li class="nav-item"><a href="/eleventy-base-blog/blog/">Posts</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Advanced Electron.js architecture</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2021-07-14">14 July 2021</time></li>
+</ul>
+
+<blockquote>
+<p>A while back, I began working on a side project called <a href="https://taggr.ai/">taggr</a>, a completely offline, interactive photo exploration app. Developing taggr required me to navigate up from the lowest level of app complexity, trying out multiple architectural approaches and exploring the limitations of each.</p>
+</blockquote>
+<p>In this article, we’ll discuss the trade-offs of different architectural approaches for building desktop applications with <a href="https://blog.logrocket.com/building-cross-platform-desktop-apps-with-svelte-electron-and-reloadly/">Electron</a>. We’ll analyze the shortcomings of each and introduce an architecture that aims to tackle them.</p>
+<p>The blueprint presented in this article is the outcome of an ongoing effort to find an approach that enables me, a solo developer, to manage the complexity of the app and meet performance requirements by leveraging standard web tooling. Let’s dive in!</p>
+<p><em>Note: You can follow along with this <a href="https://github.com/aperkaz/yarn-workspaces-electron">GitHub repository</a>.</em></p>
+<h1 id="introduction-to-electron-js" tabindex="-1">Introduction to Electron.js <a class="header-anchor" href="#introduction-to-electron-js">#</a></h1>
+<p>In the last few years, JavaScript usage has dramatically increased within the browser realm, largely with the help of libraries and frameworks like React, Vue, and Angular. Similarly, we’ve seen JavaScript grow beyond the browser with Node.js, Deno, and React Native.</p>
+<p>Electron.js is one of these frameworks. Since its release in 2013, <a href="https://www.electronjs.org/">Electron</a> has grown to become one of the most-used frameworks for building cross-platform desktop applications. VS Code, Slack, Twitch, and many other popular desktop applications are built using Electron.</p>
+<h2 id="how-electron-works" tabindex="-1">How Electron works <a class="header-anchor" href="#how-electron-works">#</a></h2>
+<p>Electron embeds Chromium and Node.js in its binary, enabling web developers to write desktop applications without writing native code. Electron implements a multi-process model composed of the main and renderer processes, which is similar to the Chromium browser.</p>
+<p>Each application’s window is a render process, which isolates the code execution at window level. The main process is responsible for the application lifecycle management, window management or render process, and native APIs like system menus, notifications, and tray icons.</p>
+<p>Each app is composed of one main process and a variable number of render processes. Render processes can be used for JavaScript code execution and can be hidden without a UI.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/fgflQPJxng-730.avif 730w"><source type="image/webp" srcset="/eleventy-base-blog/img/fgflQPJxng-730.webp 730w"><img alt="Image 1" loading="lazy" decoding="async" src="/eleventy-base-blog/img/fgflQPJxng-730.png" width="730" height="341"></picture></p>
+<p><em>Note: Electron is not the only option for building cross-platform desktop applications. Other <a href="https://github.com/sudhakar3697/electron-alternatives">alternatives</a> offer less resource consumption and lighter executables, but none share the community, learning resources, or the widespread adoption of Electron.</em></p>
+<h1 id="getting-started-with-electron" tabindex="-1">Getting started with Electron <a class="header-anchor" href="#getting-started-with-electron">#</a></h1>
+<p>If you aren’t already familiar with Electron, it’s pretty easy to get started, especially because knowledge of Node.js and JavaScript is transferrable.</p>
+<p>Electron provides abstractions and a familiar language, reducing the time to market and development costs. Essentially, what Electron does for desktop app development is similar to what React Native does for mobile development.</p>
+<p>Electron also manages building and deploying app updates, making it easy to keep cross-platform apps in a synced version. You can achieve this with auto-updates and by loading remote assets at runtime.</p>
+<p>However, the benefits of Electron are not without their trade-offs. Electron ships with Chromium and Node.js environments, causing an Electron app to consume more resources than its natively implemented counterparts. As a result, there are mixed opinions about Electron’s viability.</p>
+<p>In addition, complex Electron apps present performance and developer experience challenges related to the underlying architecture. Let’s consider these trade-offs in depth by analyzing three different app examples.</p>
+<h1 id="app-specific-tradeoffs" tabindex="-1">App-specific tradeoffs <a class="header-anchor" href="#app-specific-tradeoffs">#</a></h1>
+<p>Let’s examine the high-level architectures of three fictional apps with varying complexity. Bear in mind that our app analysis does not aim to be exhaustive, rather, it aims to tease potential apps that you can build with Electron.</p>
+<h2 id="low-complexity-app" tabindex="-1">Low-complexity app <a class="header-anchor" href="#low-complexity-app">#</a></h2>
+<p>Let’s start with a low-complexity app. For our example, we’ll consider packaging a webpage as a desktop application. Examples could include instant messaging apps, data analysis dashboards, and online streaming apps.</p>
+<p>Many businesses provide desktop versions of their successful web-based apps, making ours a common use case. We’ll use Electron to run the app on Chromium, <a href="https://www.electronjs.org/docs/tutorial/performance#5-unnecessary-polyfills">eliminating unnecessary polyfills</a> and providing a unified UI instead of a heterogeneous browser landscape.</p>
+<h3 id="low-complexity-app-main-features" tabindex="-1">Low-complexity app main features: <a class="header-anchor" href="#low-complexity-app-main-features">#</a></h3>
+<ul>
+<li>Code will be shared between the web app and the desktop app
+The update cycle will be shared between the web app and desktop app</li>
+<li>The desktop app will load the same assets as the web app and render them within Chromium</li>
+<li>The backend (if applicable) will stay unchanged</li>
+<li>The backend will be accessed the same way from both the desktop and web app</li>
+<li>Features dependent on browser support, like WebWorkers and WebGL, will function cross-platform without changes</li>
+<li>We’ll use standard web development tooling</li>
+</ul>
+<h3 id="high-level-architecture-for-low-complexity-app" tabindex="-1">High-level architecture for low-complexity app <a class="header-anchor" href="#high-level-architecture-for-low-complexity-app">#</a></h3>
+<p>As an example architecture, we’ll use a desktop app for the <a href="https://web.telegram.org/">Telegram chat</a> web app. Electron will act as a wrapper for the existing web app without requiring any changes to the backend.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/lCuK0a-Mo7-730.avif 730w"><source type="image/webp" srcset="/eleventy-base-blog/img/lCuK0a-Mo7-730.webp 730w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/lCuK0a-Mo7-730.png" width="730" height="368"></picture></p>
+<p>Setting up Electron is easy for this type of app! There are no changes needed at the web app codebase level.</p>
+<h2 id="medium-complexity-app" tabindex="-1">Medium-complexity app <a class="header-anchor" href="#medium-complexity-app">#</a></h2>
+<p>A music streaming app like Spotify, which offers offline streaming support using a local cache, is a typical example of an app with a medium level of complexity. The desktop app can use Electron to build a local cache layer.</p>
+<p>Similar to low-complexity apps, a medium-complexity app may also complement a web app. The main difference is the ability to provide offline support. Therefore, these apps are conceptually related to progressive web apps (<a href="https://blog.logrocket.com/why-you-should-turn-your-app-into-a-pwa/">PWAs</a>) with offline support.</p>
+<h3 id="main-features" tabindex="-1">Main features: <a class="header-anchor" href="#main-features">#</a></h3>
+<ul>
+<li>Most of the code can be shared between web and desktop apps (i.e., in a UI layer)</li>
+<li>The desktop app will have a local cache implementation that will intercept the backend requests, populate the cache, and serve cached results when offline</li>
+<li>We need to use high-level Electron APIs to check if the desktop app is online or offline</li>
+<li>The update cycle is not necessarily shared between the web and desktop. The desktop will load the UI from static files using its offline UI and create a custom request layer with the cache</li>
+<li>You can leverage standard web development tooling with the exception of the custom request module, which must be developed and adjusted for Electron.</li>
+</ul>
+<h3 id="high-level-architecture" tabindex="-1">High-level architecture <a class="header-anchor" href="#high-level-architecture">#</a></h3>
+<p>Let’s imagine that our streaming app plays a song of the day. If there is no internet connection, it will serve the available cached song.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/aEIFtQZ_eD-730.avif 730w"><source type="image/webp" srcset="/eleventy-base-blog/img/aEIFtQZ_eD-730.webp 730w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/aEIFtQZ_eD-730.png" width="730" height="369"></picture></p>
+<p>As outlined in the schema above, the UI will be served from local assets instead of a CDN, and the request layer has to be customized to support caching. While the example is relatively simple, the code-sharing and caching requirements will eventually increase in complexity, requiring custom Electron code.</p>
+<h2 id="high-complexity-app" tabindex="-1">High-complexity app <a class="header-anchor" href="#high-complexity-app">#</a></h2>
+<p>For the highest level of complexity, let’s look at a batch image processing app like <a href="https://github.com/lovell/sharp">sharp</a>. The app must be able to process thousands of images and work entirely offline.</p>
+<p>Offline apps are significantly different from the previous two examples. Specifically, the typical backend workloads, like image processing, will execute within Electron by creating an offline application.</p>
+<h3 id="main-features-1" tabindex="-1">Main features: <a class="header-anchor" href="#main-features-1">#</a></h3>
+<ul>
+<li>Most of our code will be custom for the desktop app</li>
+<li>The app will have its own release cycle</li>
+<li>The backend will run from within Electron (i.e., from a render process)</li>
+<li>Standard web development tooling can be used, but it depends on the defined architecture</li>
+<li>We may need to use native modules like database access, image processing, or machine learning</li>
+<li>Lower-level Electron API access may be needed from multiple processes, especially for <a href="https://blog.logrocket.com/handling-interprocess-communications-in-electron-applications-like-a-pro/">interprocess communications</a> (IPC)</li>
+</ul>
+<h3 id="high-level-architecture-1" tabindex="-1">High-level architecture <a class="header-anchor" href="#high-level-architecture-1">#</a></h3>
+<p>For the architecture proposal, let’s consider the offline image processing app described above.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/JEnVLJ0TBp-730.avif 730w"><source type="image/webp" srcset="/eleventy-base-blog/img/JEnVLJ0TBp-730.webp 730w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/JEnVLJ0TBp-730.png" width="730" height="399"></picture></p>
+<p>The schema structures the app following the Electron documentation, which brings some limitations. For one, there is noticeable performance degradation when running the long-lived, CPU-intensive operations in a hidden renderer process.</p>
+<p>Note that you should never run the operations in the <a href="https://www.electronjs.org/docs/tutorial/performance#3-blocking-the-main-process">main process</a>. Doing so may block the main process, causing your application to freeze or crash.</p>
+<p>Additionally, coupling the business logic and transport layers to Electron APIs limits the options to reuse standard web development tooling. Communications between the main processes and renderer processes use IPC, which requires a main process roundtrip when communicating between two render processes.</p>
+<p>If your app falls in the low or medium-complexity categories, congrats! Many of the headaches that arise in offline apps won’t apply to you. However, if your app requirements fall in the high complexity range, there is still hope!</p>
+<h2 id="advanced-architecture-proposal" tabindex="-1">Advanced architecture proposal <a class="header-anchor" href="#advanced-architecture-proposal">#</a></h2>
+<p>When we consider issues in offline apps like performance degradation, roundtrip communication between render processes, and the overall developer experience, we need a specialized architecture:</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/_0dEj_c7V--730.avif 730w"><source type="image/webp" srcset="/eleventy-base-blog/img/_0dEj_c7V--730.webp 730w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/_0dEj_c7V--730.png" width="730" height="460"></picture></p>
+<p>The proposed architecture is built on the following pillars:</p>
+<ul>
+<li>The code shared between the frontend and the backend is extracted into a single module</li>
+<li>The UI code is Electron agnostic, so web development best practices can be applied</li>
+<li>The UI and page routing are built using controlled components and a centralized app state</li>
+<li>The backend is run from a separate Node.js process</li>
+<li>The frontend and backend modules communicate through message passing</li>
+</ul>
+<p>Let’s go through each of the modules in detail!</p>
+<p><em>Note: parts of the stack are chosen purely due to personal preference and are interchangeable. For example, you can swap TypeScript for JavaScript, React for Vue, Redux for MobX, or npm packages for code sharing instead of Yarn workspaces. As long as the pillars mentioned above are respected, you have freedom of choice across the stack.</em></p>
+<h3 id="shared-module" tabindex="-1">Shared module <a class="header-anchor" href="#shared-module">#</a></h3>
+<p>The shared module is responsible for the code and types shared by both the frontend and backend modules. It enables you to develop both modules as separate entities while still sharing the domain-relevant code and types.</p>
+<p>Codesharing is achieved using Yarn workspaces, a simple alternative to publishing the module as an npm package, releasing, and versioning it.</p>
+<p><strong>Main features:</strong></p>
+<ul>
+<li>Typescript codebase</li>
+<li>Typings for message passing communication: contains payloads and message handlers required in both the frontend and backend</li>
+<li>Domain models and entities</li>
+<li>Shared utilities like logging and event reporting</li>
+</ul>
+<h3 id="frontend-module" tabindex="-1">Frontend module <a class="header-anchor" href="#frontend-module">#</a></h3>
+<p>The frontend module is responsible for all things UI. It contains the components and animations of our app but not the business logic. In production, Electron serves it from generated static files.</p>
+<p><strong>Main features:</strong></p>
+<ul>
+<li>Typescript codebase with access to the shared module</li>
+<li>Uses React for building the user interface with Create React App as a template</li>
+<li>Uses Redux as the state manager, which deterministically defines the UI’s render state</li>
+<li>Communication with the backend through message passing: the frontend exposes a message handler that listens for messages from the backend and modifies the Redux store accordingly</li>
+<li>Component development in isolation using Storybook</li>
+</ul>
+<h3 id="backend-with-electron-module" tabindex="-1">Backend with Electron module <a class="header-anchor" href="#backend-with-electron-module">#</a></h3>
+<p>The backend module contains the backend codebase and the Electron setup code. The business logic and long-running operations, like image processing, will run in a separate Node.js process so that the UI doesn’t suffer from degraded performance.</p>
+<p><strong>Main features:</strong></p>
+<ul>
+<li>Typescript codebase, with access to the shared module</li>
+<li>The backend runs as a forked Node.js process, which improves performance for long-running and computationally expensive tasks</li>
+<li>Access to native dependencies</li>
+<li>Performs a pre-build step that matches native dependencies with the Electron version</li>
+<li>Contains the required Electron configuration and packaging scripts</li>
+</ul>
+<h3 id="communication-layer" tabindex="-1">Communication layer <a class="header-anchor" href="#communication-layer">#</a></h3>
+<p>The frontend and backend communicate using interprocess message passing with <a href="https://github.com/RIAEvangelist/node-ipc"><code>node-ipc</code></a>. The message passing allows for <code>async</code> and event-based communication.</p>
+<p><code>async</code> communication is best suited for short-lived operations. The frontend can wait until the backend processes the message to get the result right away.</p>
+<p>Event-based communication is better suited for long-lived operations, like batch processing. As the task processes in the backend, it sends events that will modify the frontend’s app state in Redux. The backend can asynchronously complete long-running tasks and periodically update the progress displayed by the UI.</p>
+<p><strong>Main features:</strong></p>
+<ul>
+<li><code>node-ipc</code> as the communication library</li>
+<li>Fully typed message payloads and handlers in the shared module</li>
+<li>Async and message-based communication support</li>
+</ul>
+<h2 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h2>
+<p>Electron is a great choice for building cross-platform desktop applications using different web technologies. Although Electron is easy to use in low-complexity apps, performance and developer experience limitations will surface as the complexity increases.</p>
+<p>The proposed architecture aims to provide a sound conceptual foundation for high complexity apps. Of course, it may need to be extended depending on the use case, but I’ve found that it serves as a good foundation for many types of apps.</p>
+
+<ul class="links-nextprev"><li> Previous: <a href="/eleventy-base-blog/blog/2021-04-02_better-apis-with-openapi/">Better Express APIs with OpenAPI</a></li><li>Next: <a href="/eleventy-base-blog/blog/2021-08-09_exhaustive-checks/">Improving error handling in TypeScript</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/eleventy-base-blog/blog/2021-07-14_advanced-electron-architecture/` was built on 2024-09-19T20:58:45.908Z -->
+	</body>
+</html>

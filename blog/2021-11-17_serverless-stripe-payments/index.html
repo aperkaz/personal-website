@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Serverless payments with Netlify and Stripe</title>
+		<meta name="description" content="How to set up serverless online payments with Netlify and Stripe.">
+
+		<link rel="icon" type="image/png" sizes="196x196" href="/eleventy-base-blog/img/favicon-196.png">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Alain Perkaz">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Alain Perkaz">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono,
+		Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono,
+		Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New,
+		Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #c0c0c0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050f;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #c0c0c0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 40em;
+}
+
+/* prevents images from overflowing parent p in posts */
+p img {
+	width: 100%;
+	height: auto; /* Maintain aspect ratio */
+	max-width: 100%; /* Ensure the image doesn't stretch beyond its original size */
+	display: block; /* Remove inline element gap */
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	/* TODONOW: add different font for code */
+	font-family: var(--font-family-monospace);
+	font-size: 0.9rem !important;
+}
+pre:not([class*="language-"]) {
+	margin: 0.5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 2em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	word-spacing: -0.5px;
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: 0.25em;
+	padding-right: 0.5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: 0.1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/eleventy-base-blog/" class="home-link">Alain Perkaz</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/eleventy-base-blog/">Home</a></li>
+					<li class="nav-item"><a href="/eleventy-base-blog/blog/">Posts</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Serverless payments with Netlify and Stripe</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2021-11-17">17 November 2021</time></li>
+</ul>
+
+<p>One of the first steps many young startups take is setting up a static web page, perhaps with an email newsletter, to help them build an audience.</p>
+<p>As the weeks go by and the MVP is getting further along, the subject of how to handle payments will eventually emerge.</p>
+<p>From one-time payments to SaaS subscriptions, supporting online payments can be daunting and time-consuming. This post will introduce you to an easy way to process online payments with Stripe, without any extra infrastructure other than a static web page.</p>
+<p>You don't need a custom backend to store the payment information, or cron jobs to send invoices, and there's no need to track customers in a separate database. This is perfect if you are a single-founder or early-stage startup that wants to validate the idea without creating a custom solution.</p>
+<p>Sounds good? Let's dive in! 🤿</p>
+<h1 id="high-level-overview-of-the-project" tabindex="-1">High-level overview of the project <a class="header-anchor" href="#high-level-overview-of-the-project">#</a></h1>
+<p>For the sake of this article, we'll define an early-stage startup use case, where this kind of serverless online payment setup will bring the most value (low cost and fast to implement).</p>
+<p>Let's imagine our startup idea is to self-publish a book. As the book is being finalized, we would like to open the lifetime access to the book as a pre-sale.</p>
+<p>We will need a way to process payments for lifetime access to the book. For this, we'll need a payment processor and perhaps a way to run some logic away from the client (for example, leveraging the payment processor's API).</p>
+<h2 id="payment-processor" tabindex="-1">Payment processor <a class="header-anchor" href="#payment-processor">#</a></h2>
+<p>There are plenty of payment processors available, each with different terms, support for payment methods, and public APIs. For our serverless online payment processor, we'll use <a href="https://stripe.com/">Stripe</a>. I chose to use Stripe for two reasons:</p>
+<p>First, Stripe is an industry-leading payment processor with an excellent API. Their API is extensively documented, and they offer integration SDKs for many languages (JS included). Setting it up is entirely free, and you only pay a small commission per processed transaction.</p>
+<p>Second, Stripe offers Stripe Checkout, a free product specifically built to boost conversions and support various payment options. It's dead-simple to integrate and comes with a great UI.</p>
+<h2 id="what-about-the-server" tabindex="-1">What about the server? <a class="header-anchor" href="#what-about-the-server">#</a></h2>
+<p>To be clear, Stripe requires some server-side code to generate a session once a user inputs their payment data. The session is available to the developer to perform payment-related operations (without exposing the sensitive payment details).</p>
+<p>Before you get really upset with me, let me clarify that we won't need to set up a dedicated server 😅. It may seem a bit contradictory, but Stripe requires that some of the interaction code is in a server-like environment (serverless computing to the rescue!).</p>
+<p>Luckily for us, this is 2021, and there are quite a few options to execute on-demand server-side code. Most cloud providers offer this functionality (AWS lambdas, Google Cloud cloud functions, Azure functions…you name it).</p>
+<p>Since our startup already has a web page, we'll use <a href="https://www.netlify.com/products/functions/">Netlify functions</a>. It will allow us to run the server-side code with almost no extra configuration, and it plays nicely with the existing web page statics.</p>
+<p>The paradigm of combining static web assets with on-demand serverless functions is part of the <a href="https://jamstack.org/">JAM Stack</a> (we'll leave that for another post). Keep reading for the detailed instruction on how to set up serverless payments.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/lRtfCyWpYI-1828.avif 1828w"><source type="image/webp" srcset="/eleventy-base-blog/img/lRtfCyWpYI-1828.webp 1828w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/lRtfCyWpYI-1828.png" width="1828" height="758"></picture></p>
+<h1 id="step-by-step-project-setup" tabindex="-1">Step-by-step project setup <a class="header-anchor" href="#step-by-step-project-setup">#</a></h1>
+<p>Great, now that you have a clear picture of the problem space and the tools we'll use to build our solution, let's build it. 🛠</p>
+<p>The complete code example is available at https://github.com/aperkaz/serverless-payments.</p>
+<h2 id="how-to-set-up-netlify" tabindex="-1">How to set up Netlify <a class="header-anchor" href="#how-to-set-up-netlify">#</a></h2>
+<p>First, create a <a href="https://www.netlify.com/">Netlify</a> account (if you don't have one already). The free tier is enough for moderate usage, so no need to worry about that.</p>
+<p>Netlify provides CI/CD for automated deployments of our webpage and serverless functions by connecting to a Git repo in Github / Gitlab / Bitbucket. So, let's create a repo in one of those providers with your website assets.</p>
+<p>Next, install the <a href="https://cli.netlify.com/getting-started/">Netlify CLI</a>. It will ask you some questions and request access to your Netlify and Git repo provider (GitHub in my case).</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/gVAwjFUchp-2090.avif 2090w"><source type="image/webp" srcset="/eleventy-base-blog/img/gVAwjFUchp-2090.webp 2090w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/gVAwjFUchp-2090.png" width="2090" height="1146"></picture></p>
+<p>👆 output of installing the CLI with <code>npm install netlify-cli -g</code>.</p>
+<p>At this point, we can push to the repository’s <code>main</code> / <code>master</code> branch, and Netlify will automatically deploy. You can run <code>netlify open</code> in the console to open Netlify’s admin panel, and visit the deployed URL.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/uN_wmywAuJ-2880.avif 2880w"><source type="image/webp" srcset="/eleventy-base-blog/img/uN_wmywAuJ-2880.webp 2880w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/uN_wmywAuJ-2880.png" width="2880" height="1644"></picture></p>
+<p>Excellent, with the auto-deploy ready, now let's set up Stripe. 💸</p>
+<h2 id="how-to-set-up-stripe" tabindex="-1">How to set up Stripe <a class="header-anchor" href="#how-to-set-up-stripe">#</a></h2>
+<p>Create an account in Stripe, validate the email, and sign in. Then, <a href="https://stripe.com/docs/keys">generate a set of API keys</a> (Secret key and Publishable key).</p>
+<p>You have to be careful with those keys and never commit the Secret key in the code. Since we will need it in our server-side code, we'll keep it as an <a href="https://www.netlify.com/blog/2021/07/12/managing-environment-variables-from-your-terminal-with-netlify-cli/">environment variable</a>.</p>
+<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token comment"># Create a new env variable in Netlify</span>
+netlify env:set STRIPE*SECRET <span class="token string">"sk*\*\*\*\*"</span>
+
+<span class="token comment"># We can access it on our server-side JS code by:</span>
+process.env.STRIPE_SECRET</code></pre>
+<p>For the sake of this tutorial, we will use the <a href="https://stripe.com/docs/payments/accept-a-payment?integration=checkout#set-up-stripe">example API keys</a>, but feel free to use your own. If you use your keys, you will need to add products and prices (<a href="https://support.stripe.com/questions/how-to-create-products-and-prices">documentation</a>).</p>
+<h2 id="how-to-add-the-serverless-functions" tabindex="-1">How to add the serverless functions <a class="header-anchor" href="#how-to-add-the-serverless-functions">#</a></h2>
+<p>Hang on tight – we are almost there! We only need the server-side code to create Stripe Checkout sessions and complete our demo.</p>
+<p>First, to make our function accessible from https://serverless-payments.netlify.app/api/stripe, we need to add some configurations. Let's start by creating the <code>netlify.toml</code> file, on the root of our repo.</p>
+<pre class="language-yaml" tabindex="0"><code class="language-yaml"><span class="token punctuation">[</span>build<span class="token punctuation">]</span>
+command = "<span class="token comment"># no build command"</span>
+functions = "netlify/functions"
+publish = "."
+
+<span class="token punctuation">[</span><span class="token punctuation">[</span>redirects<span class="token punctuation">]</span><span class="token punctuation">]</span>
+from = '/api/\<span class="token important">*'</span>
+to = '/.netlify/functions/<span class="token punctuation">:</span>splat'
+status = 200</code></pre>
+<p>Then, we can add the session creator function. It’s explained here.</p>
+<p><em><code>📁 netlify/function/stripe.js</code></em></p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> stripe <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">"stripe"</span><span class="token punctuation">)</span><span class="token punctuation">(</span>process<span class="token punctuation">.</span>env<span class="token punctuation">.</span><span class="token constant">STRIPE_SECRET</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+exports<span class="token punctuation">.</span><span class="token function-variable function">handler</span> <span class="token operator">=</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> context</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+	<span class="token keyword">const</span> session <span class="token operator">=</span> <span class="token keyword">await</span> stripe<span class="token punctuation">.</span>checkout<span class="token punctuation">.</span>sessions<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+		<span class="token literal-property property">payment_method_types</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"card"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+		<span class="token literal-property property">line_items</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+			<span class="token punctuation">{</span>
+				<span class="token literal-property property">price_data</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+					<span class="token literal-property property">currency</span><span class="token operator">:</span> <span class="token string">"usd"</span><span class="token punctuation">,</span>
+					<span class="token literal-property property">product_data</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+						<span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">"T-shirt"</span><span class="token punctuation">,</span>
+					<span class="token punctuation">}</span><span class="token punctuation">,</span>
+					<span class="token literal-property property">unit_amount</span><span class="token operator">:</span> <span class="token number">2000</span><span class="token punctuation">,</span>
+				<span class="token punctuation">}</span><span class="token punctuation">,</span>
+				<span class="token literal-property property">quantity</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+			<span class="token punctuation">}</span><span class="token punctuation">,</span>
+		<span class="token punctuation">]</span><span class="token punctuation">,</span>
+		<span class="token literal-property property">mode</span><span class="token operator">:</span> <span class="token string">"payment"</span><span class="token punctuation">,</span>
+		<span class="token literal-property property">success_url</span><span class="token operator">:</span> <span class="token string">"https://serverless-payments.netlify.app/success"</span><span class="token punctuation">,</span>
+		<span class="token literal-property property">cancel_url</span><span class="token operator">:</span> <span class="token string">"https://serverless-payments.netlify.app/cancel"</span><span class="token punctuation">,</span>
+	<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">return</span> <span class="token punctuation">{</span>
+		<span class="token literal-property property">statusCode</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+		<span class="token literal-property property">body</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+			<span class="token literal-property property">id</span><span class="token operator">:</span> session<span class="token punctuation">.</span>id<span class="token punctuation">,</span>
+		<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+	<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<p>Now we can call the serverless functions from our JS body with <code>fetch(&quot;/api/stripe&quot;)</code>. It will scale depending on the load and you only paid for the invocations. Then it will be deployed on every push to <code>main</code>. Sweet! 🍬</p>
+<p>For the sake of brevity, I skipped the remaining code in the HTML files that handles the Stripe Checkout callbacks. The code is available <a href="https://github.com/aperkaz/serverless-payments">here</a>.</p>
+<p>The complete example is available at https://serverless-payments.netlify.app . You can test a successful payment flow by using <code>4242 4242 4242 4242</code> as a credit card number.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/Invt6DKo-K-2880.avif 2880w"><source type="image/webp" srcset="/eleventy-base-blog/img/Invt6DKo-K-2880.webp 2880w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/Invt6DKo-K-2880.png" width="2880" height="1644"></picture></p>
+<p>👆 Stripe Checkout in all its glory, accessible from our page.</p>
+<h1 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h1>
+<p>Online payments are critical to many online businesses but are often implemented in a rush or are over-engineered. The solution presented above applies to single-page applications, so you may not need a fully-fledged server for handling payments just yet. 🙂</p>
+<p>I hope this article helps shed some light on adding payment processing to your existing web pages easily. Sell your product quickly and make customers happy!</p>
+
+<ul class="links-nextprev"><li> Previous: <a href="/eleventy-base-blog/blog/2021-10-07_node-with-PM2/">Node.js with PM2</a></li><li>Next: <a href="/eleventy-base-blog/blog/2022-03-03_typing-date-strings/">Date-strings in TypeScript</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/eleventy-base-blog/blog/2021-11-17_serverless-stripe-payments/` was built on 2024-09-19T20:58:45.909Z -->
+	</body>
+</html>

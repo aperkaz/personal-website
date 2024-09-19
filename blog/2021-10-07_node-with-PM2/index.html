@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Node.js with PM2</title>
+		<meta name="description" content="Best practices for Node.js process management with PM2.">
+
+		<link rel="icon" type="image/png" sizes="196x196" href="/eleventy-base-blog/img/favicon-196.png">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Alain Perkaz">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Alain Perkaz">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono,
+		Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono,
+		Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New,
+		Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #c0c0c0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050f;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #c0c0c0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 40em;
+}
+
+/* prevents images from overflowing parent p in posts */
+p img {
+	width: 100%;
+	height: auto; /* Maintain aspect ratio */
+	max-width: 100%; /* Ensure the image doesn't stretch beyond its original size */
+	display: block; /* Remove inline element gap */
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	/* TODONOW: add different font for code */
+	font-family: var(--font-family-monospace);
+	font-size: 0.9rem !important;
+}
+pre:not([class*="language-"]) {
+	margin: 0.5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 2em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	word-spacing: -0.5px;
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: 0.25em;
+	padding-right: 0.5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: 0.1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/eleventy-base-blog/" class="home-link">Alain Perkaz</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/eleventy-base-blog/">Home</a></li>
+					<li class="nav-item"><a href="/eleventy-base-blog/blog/">Posts</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Node.js with PM2</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2021-10-07">07 October 2021</time></li>
+</ul>
+
+<p>Writing the perfect app is only half of the job of a developer. How you design your app’s deployment strategy and monitor it throughout its lifecycle can determine the success or failure of your project, regardless of whether you’re using Heroku, Docker, or Kubernetes to manage your infrastructure.</p>
+<p>In this article, we’ll explore a few best practices for managing production deployment in Node.js applications. First, we’ll review how Node.js works internally, then clarify production deployment requirements at the process level. Finally, we’ll explore possible approaches to managing production deployment.</p>
+<p>Keep in mind that there are countless ways to perform production deployments in the Node.js ecosystem. Therefore, this article will focus solely on Node.js process management in production environments instead of containerization or fully-managed apps. Let’s get started!</p>
+<h1 id="node-js-internals" tabindex="-1">Node.js internals <a class="header-anchor" href="#node-js-internals">#</a></h1>
+<p>To better understand the requirements for production process management, let’s consider how Node.js operates internally as an asynchronous, event-driven, and single-threaded platform.</p>
+<p>Node.js can execute time-consuming operations asynchronously without blocking other operations. For example, Node.js can concurrently process multiple network requests by ordering callbacks to be executed in a <a href="https://blog.logrocket.com/a-complete-guide-to-the-node-js-event-loop/">FIFO queue, the Event Loop</a>.</p>
+<p>As an event-driven environment, Node.js propagates state changes and events internally. For example, when opening a file, instead of blocking the execution until the file is opened, Node.js fires an event only when the file is opened. Therefore, the callback is executed upon completion.</p>
+<p>A single instance of Node.js runs in a single thread. Even in multi-core systems, a Node.js process won’t take advantage of more than one CPU.</p>
+<p>Now that we’ve revisited the primary characteristic defining Node.js, let’s dive into the intrinsic requirements for production deployments at the process level.</p>
+<h1 id="node-js-production-requirements" tabindex="-1">Node.js production requirements <a class="header-anchor" href="#node-js-production-requirements">#</a></h1>
+<p>A successful production deployment is comprised of many moving pieces, for example, source code management, continuous integration pipelines, and continuous delivery pipelines. Monitoring your app’s processes and lifecycle once deployed is only one part of a larger process.</p>
+<p>Before we can consider the different possible strategies for managing an app’s lifecycle, let’s review the requirements and best practices for a successful deployment strategy.</p>
+<p>For example, let’s imagine that we’re building a web server that serves HTTP requests, a very common use case for Node.js.</p>
+<p>When running a web server in production, it’s safe to assume that it must be continuously active in order to respond to incoming HTTP requests. The web server must be resilient and able to recover gracefully from unexpected errors, crashes, and unhandled exceptions. In Node.js, a single unhandled exception has the potential to crash the entire process.</p>
+<p>Secondly, once deployed, the server should fully utilize the infrastructure underneath. When deploying Node.js through cloud providers, multiple vCPUs are often available under the hood. By default, a Node.js process only takes advantage of one CPU, missing out on many potential performance gains.</p>
+<p>Finally, as our web server gains more traffic, we need to monitor the Node.js process to spot faulty behaviors like memory leaks and identify potential bottlenecks. Debugging production issues on non-monitored processes is like coding using voice commands, which is not for the faint-hearted!</p>
+<p>You should also consider any additional requirements that are specific to Node.js applications, for example, programmed execution for Chrome. While these are out of the scope of this article, they may be worth considering depending on your specific use case.</p>
+<h1 id="process-management-with-pm2" tabindex="-1">Process management with PM2 <a class="header-anchor" href="#process-management-with-pm2">#</a></h1>
+<p>Now that we understand the main requirements for Node.js process management in production, let’s address them by leveraging <a href="https://pm2.keymetrics.io/">PM2</a>, the most popular Node.js process manager.</p>
+<p>First, let’s set up PM2 by installing it as an npm package and replacing the script as follows:</p>
+<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token comment"># Add pm2 to your app (install it globally for terminal access)</span>
+<span class="token function">npm</span> <span class="token function">install</span> pm2 <span class="token parameter variable">-g</span>
+
+<span class="token comment"># Start your app with:</span>
+pm2 start app.js
+
+<span class="token comment"># 🎉 Congratulations, your app processes are now managed by PM2!</span></code></pre>
+<p>Let’s see how PM2 addresses the process management level requirements that we described above.</p>
+<h2 id="resiliency" tabindex="-1">Resiliency <a class="header-anchor" href="#resiliency">#</a></h2>
+<p>Whenever an unhandled exception is thrown in Node.js, the process will crash and exit. We can’t completely control how often this happens, so it’s crucial to plan conservatively. We can recover process crashes at different levels within our stack, for example, the system process level, the container level, or the server level.</p>
+<p>When dealing with a stateless Node.js process that doesn’t rely on the server’s filesystem or memory to keep data between requests, I prefer to handle the crash recovery at the system process level, prioritizing speed. For example, when we restart a process within a container, like Docker, at the container level, the Node.js process startup time will be added to the container’s restart time.</p>
+<p>By default, PM2 instantly restarts any process that crashes, increasing resiliency. Although crashing in production is a serious matter, the auto-restart gives you a head start to fix the source of the crash, minimizing the impact on your customers.</p>
+<h2 id="utilizing-the-infrastructure" tabindex="-1">Utilizing the infrastructure <a class="header-anchor" href="#utilizing-the-infrastructure">#</a></h2>
+<p>Even if a Node.js process is single-threaded, there are several ways that we can tap into the total CPU capacity of the environment that the process is running in.</p>
+<p>For one, we could launch multiple instances of our web server process, then manually load balance the requests with an external tool such as NGIX. However, Node.js already provides a way to <a href="https://blog.logrocket.com/optimize-node-js-performance-with-clustering/">spawn multiple processes sharing the same port</a> using the Cluster Module.</p>
+<p>Additionally, PM2 abstracts away the Cluster Module, allowing for networked Node.js applications to scale to all available CPUs. A command line argument automatically creates as many processes as there are available CPU cores, load balancing the incoming network traffic between them.</p>
+<p>When combined with the automatic restart feature, the app becomes way more resilient. PM2 handles each process’s lifecycle in isolation and restarts only what is needed:</p>
+<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token comment"># Start the app with as many processes as CPU cores are available</span>
+pm2 start app.js <span class="token parameter variable">-i</span> max</code></pre>
+<h2 id="monitoring" tabindex="-1">Monitoring <a class="header-anchor" href="#monitoring">#</a></h2>
+<p>While you can manually <a href="https://nodejs.org/api/cli.html#cli_cpu_prof">tap into the JavaScript V8 Engine</a> and collect the data you want, I recommend using a prebuilt application performance monitoring (APM) tool. Luckily for us, PM2 already provides one through the terminal and as a paid web service. You can access valuable information about the app services, like CPU, memory usage, request latency, and console logs.</p>
+<p>Once the app is running with PM2,add the following code in the terminal:</p>
+<pre class="language-bash" tabindex="0"><code class="language-bash">pm2 monit</code></pre>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/5gLRG0dFqK-730.avif 730w"><source type="image/webp" srcset="/eleventy-base-blog/img/5gLRG0dFqK-730.webp 730w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/5gLRG0dFqK-730.png" width="730" height="474"></picture></p>
+<h1 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h1>
+<p>Hopefully, this article has shed some light on the importance of proper Node.js process management in production, an aspect that is often disregarded in my own experience.</p>
+<p>Production process management is a complex topic, and PM2 is not a silver bullet. The best solution for your project will depend on the stack your company uses and its existing infrastructure. With that said, it’s worth checking if your production Node.js deployments are benefiting from the infrastructure.</p>
+<p>Good process management is just the first step towards scaling your Node.js application.
+Happy coding! 🚀</p>
+
+<ul class="links-nextprev"><li> Previous: <a href="/eleventy-base-blog/blog/2021-08-09_exhaustive-checks/">Improving error handling in TypeScript</a></li><li>Next: <a href="/eleventy-base-blog/blog/2021-11-17_serverless-stripe-payments/">Serverless payments with Netlify and Stripe</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/eleventy-base-blog/blog/2021-10-07_node-with-PM2/` was built on 2024-09-19T20:58:45.909Z -->
+	</body>
+</html>

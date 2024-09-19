@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2021-03-02_clean-apis-in-react-with-ts/</loc>
+		<lastmod>2021-03-02</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2021-04-02_better-apis-with-openapi/</loc>
+		<lastmod>2021-04-02</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2021-07-14_advanced-electron-architecture/</loc>
+		<lastmod>2021-07-14</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2021-08-09_exhaustive-checks/</loc>
+		<lastmod>2021-08-09</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2021-10-07_node-with-PM2/</loc>
+		<lastmod>2021-10-07</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2021-11-17_serverless-stripe-payments/</loc>
+		<lastmod>2021-11-17</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2022-03-03_typing-date-strings/</loc>
+		<lastmod>2022-03-03</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2022-09-12_dependency-boundaries/</loc>
+		<lastmod>2022-09-12</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2023-03-01_typing-css-modules/</loc>
+		<lastmod>2023-03-01</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/2024-05-01_typing-dynamic-apis/</loc>
+		<lastmod>2024-05-01</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/blog/</loc>
+		<lastmod>2024-09-19</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/</loc>
+		<lastmod>2024-09-19</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://alainperkaz.com/eleventy-base-blog/tags/</loc>
+		<lastmod>2024-09-19</lastmod>
+	</url>
+</urlset>

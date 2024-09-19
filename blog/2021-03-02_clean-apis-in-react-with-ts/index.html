@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Clean APIs in React with TypeScript</title>
+		<meta name="description" content="Designing cleaner type APIs for React components.">
+
+		<link rel="icon" type="image/png" sizes="196x196" href="/eleventy-base-blog/img/favicon-196.png">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Alain Perkaz">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Alain Perkaz">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono,
+		Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono,
+		Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New,
+		Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #c0c0c0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050f;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #c0c0c0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 40em;
+}
+
+/* prevents images from overflowing parent p in posts */
+p img {
+	width: 100%;
+	height: auto; /* Maintain aspect ratio */
+	max-width: 100%; /* Ensure the image doesn't stretch beyond its original size */
+	display: block; /* Remove inline element gap */
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	/* TODONOW: add different font for code */
+	font-family: var(--font-family-monospace);
+	font-size: 0.9rem !important;
+}
+pre:not([class*="language-"]) {
+	margin: 0.5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 2em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	word-spacing: -0.5px;
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: 0.25em;
+	padding-right: 0.5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: 0.1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/eleventy-base-blog/" class="home-link">Alain Perkaz</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/eleventy-base-blog/">Home</a></li>
+					<li class="nav-item"><a href="/eleventy-base-blog/blog/">Posts</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Clean APIs in React with TypeScript</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2021-03-02">02 March 2021</time></li>
+</ul>
+
+<p>I hope this article shares some light on how to build better React components leveraging TypeScript. This post is an outcome of the efforts of building <a href="https://taggr.ai/">taggr</a>, the privacy-focused AI gallery.</p>
+<hr>
+<blockquote>
+<p>While building <a href="https://taggr.ai/">taggr</a>, I got deeper into TypeScript, and so far I am loving the added capabilities for annotating types and catching errors at compile time, instead off at runtime.</p>
+</blockquote>
+<blockquote>
+<p>It can feel daunting and extra work to annotate each component and function at first, but as the codebase grows in size and complexity, the benefits start to shine.</p>
+</blockquote>
+<blockquote>
+<p>Having the components and business-logic code properly typed, keeps a unique source of truth for the entities of a domain, minimizing the human errors across the application layers.</p>
+</blockquote>
+<blockquote>
+<p>Plus, TypeScript definitions can be automatically generated from <a href="https://github.com/drwpow/openapi-typescript">OpenAPI</a>, <a href="https://graphql-code-generator.com/docs/plugins/typescript">GraphQL schemas</a>… A total win-win 🎉</p>
+</blockquote>
+<hr>
+<p>When building React components, I try to keep their APIs as tight and as clean as possible. 🧹💨</p>
+<p>Components with clear boundaries are easy to re-use, extend and overall nice to work with.</p>
+<p>Let’s analyze a concrete example of how we can do cleaner component APIs using TypeScript, shall we?</p>
+<br>
+<h2 id="don-t-expose-prop-types-from-a-component" tabindex="-1">Don’t expose Prop types from a component 😧 <a class="header-anchor" href="#don-t-expose-prop-types-from-a-component">#</a></h2>
+<p><em><code>📁 paragraph.tsx</code></em></p>
+<pre class="language-tsx" tabindex="0"><code class="language-tsx"><span class="token keyword">export</span> <span class="token keyword">type</span> <span class="token class-name">Props</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+	text<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">Paragraph</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">{</span> text <span class="token punctuation">}</span><span class="token operator">:</span> Props<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span><span class="token punctuation">{</span>text<span class="token punctuation">}</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span><span class="token punctuation">;</span></code></pre>
+<p><em><code>📁 title.tsx</code></em></p>
+<pre class="language-tsx" tabindex="0"><code class="language-tsx"><span class="token comment">// Title is now tightly coupled to paragraph.txs > Props</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Props <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"./paragraph"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">Title</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">{</span> text <span class="token punctuation">}</span><span class="token operator">:</span> Props<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">></span></span><span class="token punctuation">{</span>text<span class="token punctuation">}</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span><span class="token punctuation">;</span></code></pre>
+<h3 id="why-is-this-bad" tabindex="-1">Why is this bad? <a class="header-anchor" href="#why-is-this-bad">#</a></h3>
+<ul>
+<li>When exposing the Prop types directly, nothing stops other developers (even your future self 😂) from importing and extending those types in other parts of the application. This breaks component’s encapsulation and creates unnecessary dependencies between components.</li>
+<li>Changes to the Prop types of the original component can potentially break other parts of the app 💥</li>
+<li>A cluttered API, the module exports the component and types. This can quickly turn into component files exporting multiple types, so be careful 🧐</li>
+</ul>
+<br>
+<h2 id="a-better-way" tabindex="-1">A better way ✅ <a class="header-anchor" href="#a-better-way">#</a></h2>
+<p>Do not directly expose component Props types. <strong>Don’t</strong>.</p>
+<p><em>What if want to access the Props of another component, so I don’t have to re-declare domain-specific types?</em></p>
+<p>A component’s <strong>Props</strong> define the interface of the component with the rest of your application (or the world 🌎).</p>
+<p>If you have a <code>UserProfile</code> component and the <strong>Props</strong> declare a <code>User</code> type that you want to use somewhere else in your app, it should be extracted out of the <code>UserProfile</code>.</p>
+<p>Extract domain-specific types into <code>./types</code> so that they can be reused across the app.</p>
+<p><em><code>📁 user-types.ts</code></em></p>
+<pre class="language-tsx" tabindex="0"><code class="language-tsx"><span class="token keyword">export</span> <span class="token keyword">interface</span> <span class="token class-name">User</span> <span class="token punctuation">{</span>
+	name<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+	age<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p><em><code>📁 user-profile.tsx</code></em></p>
+<pre class="language-tsx" tabindex="0"><code class="language-tsx"><span class="token keyword">import</span> <span class="token punctuation">{</span>User<span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./user-types'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">type</span> <span class="token class-name">Props</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  user<span class="token operator">:</span> User<span class="token punctuation">,</span>
+  date<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">,</span> <span class="token comment">// other props</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">UserProfile</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">{</span>user<span class="token punctuation">,</span> date<span class="token punctuation">}</span><span class="token operator">:</span> Props<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token operator">...</span>
+<span class="token keyword">export</span> <span class="token keyword">default</span> UserProfile<span class="token punctuation">;</span></code></pre>
+<p><em><code>📁 user-list.tsx</code></em></p>
+<pre class="language-tsx" tabindex="0"><code class="language-tsx"><span class="token keyword">import</span> <span class="token punctuation">{</span>User<span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./user-types'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">type</span> <span class="token class-name">Props</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  users<span class="token operator">:</span> User<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">UserList</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">{</span>users<span class="token punctuation">}</span><span class="token operator">:</span> Props<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token operator">...</span>
+<span class="token keyword">export</span> <span class="token keyword">default</span> UserList<span class="token punctuation">;</span></code></pre>
+<p><strong>What if I need to get access to a component’s properties from somewhere else?</strong></p>
+<p>They are valid reasons for wanting to access a component’s types, such as enhancing a component with <a href="https://medium.com/javascript-scene/do-react-hooks-replace-higher-order-components-hocs-7ae4a08b7b58">HOC</a>s.</p>
+<p>Lets check the next section to solve this!</p>
+<br>
+<h2 id="prop-type-lookup" tabindex="-1">Prop type lookup ✨ <a class="header-anchor" href="#prop-type-lookup">#</a></h2>
+<p>We can leverage TypeScript’s type resolution, to enable Prop type lookup.</p>
+<p>Setup prop type lookup helper, <code>GetComponentProps</code>:</p>
+<p><em><code>📁 utils.ts</code></em></p>
+<pre class="language-tsx" tabindex="0"><code class="language-tsx"><span class="token keyword">export</span> <span class="token keyword">type</span> <span class="token class-name">GetComponentProps<span class="token operator">&lt;</span><span class="token constant">T</span><span class="token operator">></span></span> <span class="token operator">=</span> <span class="token constant">T</span> <span class="token keyword">extends</span>
+	<span class="token operator">|</span> React<span class="token punctuation">.</span>ComponentType<span class="token operator">&lt;</span><span class="token keyword">infer</span> <span class="token constant">P</span><span class="token operator">></span>
+	<span class="token operator">|</span> React<span class="token punctuation">.</span>Component<span class="token operator">&lt;</span><span class="token keyword">infer</span> <span class="token constant">P</span><span class="token operator">></span>
+	<span class="token operator">?</span> <span class="token constant">P</span>
+	<span class="token operator">:</span> <span class="token builtin">never</span><span class="token punctuation">;</span></code></pre>
+<p>Define the component that we want to extend, <code>Title</code>:</p>
+<p><em><code>📁 title.tsx</code></em></p>
+<pre class="language-tsx" tabindex="0"><code class="language-tsx"><span class="token keyword">type</span> <span class="token class-name">Color</span> <span class="token operator">=</span> <span class="token string">"RED"</span> <span class="token operator">|</span> <span class="token string">"BLUE"</span> <span class="token operator">|</span> <span class="token string">"GREEN"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">type</span> <span class="token class-name">Props</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+	title<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+	color<span class="token operator">:</span> Color<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">Title</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">{</span> title<span class="token punctuation">,</span> color <span class="token punctuation">}</span><span class="token operator">:</span> Props<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token operator">&lt;</span>h1 style<span class="token operator">=></span><span class="token punctuation">{</span>title<span class="token punctuation">}</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span><span class="token punctuation">;</span>
+<span class="token keyword">export</span> <span class="token keyword">default</span> Title<span class="token punctuation">;</span></code></pre>
+<p>Extend the Title component, while keeping full type safety:</p>
+<p><em><code>📁 title-wrapper.tsx</code></em></p>
+<pre class="language-tsx" tabindex="0"><code class="language-tsx"><span class="token keyword">import</span> Title <span class="token keyword">from</span> <span class="token string">"./title"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> GetComponentProps <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"./utils"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">type</span> <span class="token class-name">Props</span> <span class="token operator">=</span> GetComponentProps<span class="token operator">&lt;</span><span class="token keyword">typeof</span> Title<span class="token operator">></span> <span class="token operator">&amp;</span> <span class="token punctuation">{</span>
+	<span class="token function-variable function">onClick</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token keyword">void</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">TitleWrapper</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">{</span> onClick<span class="token punctuation">,</span> <span class="token operator">...</span>rest <span class="token punctuation">}</span><span class="token operator">:</span> Props<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">onClick</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>onClick<span class="token punctuation">}</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+		</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">Title</span></span> <span class="token spread"><span class="token punctuation">{</span><span class="token operator">...</span>rest<span class="token punctuation">}</span></span> <span class="token punctuation">/></span></span><span class="token plain-text">
+	</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">export</span> <span class="token keyword">default</span> TitleWrapper<span class="token punctuation">;</span></code></pre>
+<p><em><code>📁 index.tsx</code></em></p>
+<pre class="language-tsx" tabindex="0"><code class="language-tsx"><span class="token keyword">import</span> TitleWrapper <span class="token keyword">from</span> <span class="token string">"title-wrapper"</span><span class="token punctuation">;</span> <span class="token comment">// Full type safety and autocompletion! 🎉</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">App</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">TitleWrapper</span></span>
+		<span class="token attr-name">title</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Hello there<span class="token punctuation">"</span></span>
+		<span class="token attr-name">color</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>GREEN<span class="token punctuation">"</span></span>
+		<span class="token attr-name">onClick</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> window<span class="token punctuation">.</span><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"title pressed"</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span>
+	<span class="token punctuation">/></span></span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<br>
+<p>We managed to access the properties of <code>Title</code> from <code>TitleWrapper</code> , without manually exposing them and breaking encapsulation, great! 🎉</p>
+
+<ul class="links-nextprev"><li>Next: <a href="/eleventy-base-blog/blog/2021-04-02_better-apis-with-openapi/">Better Express APIs with OpenAPI</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/eleventy-base-blog/blog/2021-03-02_clean-apis-in-react-with-ts/` was built on 2024-09-19T20:58:45.907Z -->
+	</body>
+</html>

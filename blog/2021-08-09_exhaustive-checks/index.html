@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Improving error handling in TypeScript</title>
+		<meta name="description" content="Using exhaustive type checking for a better error controll in TS.">
+
+		<link rel="icon" type="image/png" sizes="196x196" href="/eleventy-base-blog/img/favicon-196.png">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Alain Perkaz">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Alain Perkaz">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono,
+		Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono,
+		Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New,
+		Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #c0c0c0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050f;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #c0c0c0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 40em;
+}
+
+/* prevents images from overflowing parent p in posts */
+p img {
+	width: 100%;
+	height: auto; /* Maintain aspect ratio */
+	max-width: 100%; /* Ensure the image doesn't stretch beyond its original size */
+	display: block; /* Remove inline element gap */
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	/* TODONOW: add different font for code */
+	font-family: var(--font-family-monospace);
+	font-size: 0.9rem !important;
+}
+pre:not([class*="language-"]) {
+	margin: 0.5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 2em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	word-spacing: -0.5px;
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: 0.25em;
+	padding-right: 0.5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: 0.1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/eleventy-base-blog/" class="home-link">Alain Perkaz</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/eleventy-base-blog/">Home</a></li>
+					<li class="nav-item"><a href="/eleventy-base-blog/blog/">Posts</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Improving error handling in TypeScript</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2021-08-09">09 August 2021</time></li>
+</ul>
+
+<p>There are very few programs that work in complete isolation. Even if developers always write perfect code, there is a high likelihood of encountering errors when code interacts with external components like databases, REST APIs, and even that trendy npm package that has a bunch of stars!</p>
+<p>Instead of sitting back while the server crashes, a responsible developer thinks defensively and prepares for when a malformed request comes in. In this article, we’ll cover a few of the most common approaches for error handling in TypeScript. We’ll learn how each method is used, see how each method could be improved, and finally, propose a cleaner way to manage errors.</p>
+<p>Let’s get started!</p>
+<p><em>Note: If you’re not familiar with TypeScript, good news. The conditions that cause errors and the solutions also apply to JavaScript.</em></p>
+<h1 id="popular-typescript-error-handling-approaches" tabindex="-1">Popular TypeScript error handling approaches <a class="header-anchor" href="#popular-typescript-error-handling-approaches">#</a></h1>
+<p>Before we dig in, keep in mind that the following list is by no means exhaustive. The errors and solutions presented here are based on my subjective experience, so your mileage may vary. 🏎️</p>
+<h2 id="returning-null" tabindex="-1">Returning null <a class="header-anchor" href="#returning-null">#</a></h2>
+<p>Returning null is a common way to indicate that something in your code went wrong. It is best used when a function only has one way to fail, however, some developers use it when a function has many errors.</p>
+<p>Returning null forces null checks everywhere in your code, causing specific information about the cause of the error to be lost. Returning null is an arbitrary representation of an error, so if you try returning <code>0</code>, <code>-1</code>, or <code>false</code>, you’ll end up with the same result.</p>
+<p>In the code block below, we’ll write a function that retrieves data about the temperature and humidity of a given city. The <code>getWeather</code> function interacts with two external APIs through two functions, <code>externalTemperatureAPI</code> and <code>externalHumidityAPI</code>, and aggregates the results:</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">const</span> getWeather <span class="token operator">=</span> <span class="token keyword">async</span> <span class="token punctuation">(</span>
+	city<span class="token operator">:</span> <span class="token builtin">string</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">Promise</span><span class="token operator">&lt;</span><span class="token punctuation">{</span> temp<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span> humidity<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token punctuation">}</span> <span class="token operator">|</span> <span class="token keyword">null</span><span class="token operator">></span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+	<span class="token keyword">const</span> temp <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">externalTemperatureAPI</span><span class="token punctuation">(</span>city<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>temp<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Error fetching temperature for </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>city<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">const</span> humidity <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">externalHumidityAPI</span><span class="token punctuation">(</span>city<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>humidity<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Error fetching humidity for </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>city<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">return</span> <span class="token punctuation">{</span> temp<span class="token punctuation">,</span> humidity <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> weather <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">getWeather</span><span class="token punctuation">(</span><span class="token string">"Berlin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>weather <span class="token operator">===</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"getWeather() failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>We can see that on entering <code>Berlin</code>, we receive the error messages <code>Error fetching temperature for ${city}</code> and <code>Error fetching humidity for ${city}</code>.</p>
+<p>Both of our external API functions can fail, so <code>getWeather</code> is forced to check for null for both functions. Although checking for null is better than not handling errors at all, it forces the caller to make some guesses. If a function is extended to support a new error, the caller won’t know it unless they check the inners of the function.</p>
+<p>Let’s say that <code>externalTemperatureAPI</code> initially throws a null when the temperature API returns <code>HTTP code 500</code>, which indicates an internal server error. If we extend our function to check the structural and type validity of the API response (i.e., check that the response is of <code>type number</code>), the caller will not know if the function returns null due to <code>HTTP code 500</code> or an unexpected API response structure.</p>
+<h2 id="throwing-custom-errors-using-try-catch" tabindex="-1">Throwing custom errors using try...catch <a class="header-anchor" href="#throwing-custom-errors-using-try-catch">#</a></h2>
+<p>Creating custom errors and throwing them is a better option than returning null because we can achieve error granularity, which enables a function to throw distinct errors and allows the caller of the function to handle the distinct errors separately.</p>
+<p>However, any function that throws an error will be stopped and propagated up, disrupting the regular flow of the code. Although this may not seem like a big deal, especially for smaller applications, as your code continues to layer <code>try...catch</code> after <code>try...catch</code>, readability and overall performance will decline.</p>
+<p>Let’s try to solve the error in our weather example with the <code>try...catch</code> method:</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">const</span> getWeather <span class="token operator">=</span> <span class="token keyword">async</span> <span class="token punctuation">(</span>
+	city<span class="token operator">:</span> <span class="token builtin">string</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">Promise</span><span class="token operator">&lt;</span><span class="token punctuation">{</span> temp<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span> humidity<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token punctuation">}</span><span class="token operator">></span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+	<span class="token keyword">try</span> <span class="token punctuation">{</span>
+		<span class="token keyword">const</span> temp <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">externalTemperatureAPI</span><span class="token punctuation">(</span>city<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">try</span> <span class="token punctuation">{</span>
+			<span class="token keyword">const</span> humidity <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">externalHumidityAPI</span><span class="token punctuation">(</span>city<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span>error<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Error fetching humidity for </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>city<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+			<span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Error</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Error fetching humidity for </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>city<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">}</span>
+		<span class="token keyword">return</span> <span class="token punctuation">{</span> temp<span class="token punctuation">,</span> humidity <span class="token punctuation">}</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span>error<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Error fetching temperature for </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>city<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Error</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Error fetching temperature for </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>city<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">try</span> <span class="token punctuation">{</span>
+	<span class="token keyword">const</span> weather <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">getWeather</span><span class="token punctuation">(</span><span class="token string">"Berlin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span>error<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"getWeather() failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>In the code block above, when we try to access the <code>externalTemperatureAPI</code> and the <code>externalHumidityAPI</code>, we are met with two errors in the <code>console.log</code>, which are then stopped and propagated up several times.</p>
+<h1 id="the-result-class" tabindex="-1">The Result class <a class="header-anchor" href="#the-result-class">#</a></h1>
+<p>When you use either of the two error handling approaches discussed above, a simple mistake can add unnecessary complexity on top of the original error. The problems that arise when returning null and throwing a <code>try...catch</code> are common in other frontend languages like <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/">Kotlin</a>, Rust, and C#. These three languages use the <code>Result</code> class as a fairly generalized solution.</p>
+<p>Regardless of whether execution succeeds or fails, the <code>Result</code> class will encapsulate the results of the given function, allowing the function callers to handle errors as part of the normal execution flow instead of as an exception.</p>
+<p>When paired with TypeScript, the <code>Result</code> class provides <a href="https://blog.logrocket.com/pattern-matching-and-type-safety-in-typescript-1da1231a2e34/">type safety</a> and detailed information about the possible errors that a function could result in. When we modify the error results of a function, the <code>Result</code> class provides us with compile-time errors in the affected places of our codebase.</p>
+<p>Let’s look back at our weather example. We’ll use a TypeScript implementation of Rust’s Result and Option objects, <a href="https://github.com/vultix/ts-results">ts-results</a>:</p>
+<p><em>There are other packages for TypeScript with very similar APIs, like <a href="https://github.com/supermacro/neverthrow">NeverThrow</a>, so feel free to play around.</em></p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">import</span> <span class="token punctuation">{</span> Ok<span class="token punctuation">,</span> Err<span class="token punctuation">,</span> Result <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"ts-results"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">type</span> <span class="token class-name">Errors</span> <span class="token operator">=</span> <span class="token string">"CANT_FETCH_TEMPERATURE"</span> <span class="token operator">|</span> <span class="token string">"CANT_FETCH_HUMIDITY"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> getWeather <span class="token operator">=</span> <span class="token keyword">async</span> <span class="token punctuation">(</span>
+	city<span class="token operator">:</span> <span class="token builtin">string</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">Promise</span><span class="token operator">&lt;</span>Result<span class="token operator">&lt;</span><span class="token punctuation">{</span> temp<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span> humidity<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> Errors<span class="token operator">>></span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+	<span class="token keyword">const</span> temp <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">externalTemperatureAPI</span><span class="token punctuation">(</span>city<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>temp<span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"CANT_FETCH_TEMPERATURE"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token keyword">const</span> humidity <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">externalHumidityAPI</span><span class="token punctuation">(</span>city<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>humidity<span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"CANT_FETCH_HUMIDITY"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token keyword">return</span> <span class="token function">Ok</span><span class="token punctuation">(</span><span class="token punctuation">{</span> temp<span class="token punctuation">,</span> humidity <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> weatherResult <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">getWeather</span><span class="token punctuation">(</span><span class="token string">"Berlin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// `weatherResult` is fully typed</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span>weatherResult<span class="token punctuation">.</span>err<span class="token punctuation">)</span> <span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">getWeather() failed: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>weatherResult<span class="token punctuation">.</span>val<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>weatherResult<span class="token punctuation">.</span>ok<span class="token punctuation">)</span> <span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Weather is: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>weather<span class="token punctuation">.</span>val<span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>Adding type-safe results from the function and prioritizing error handling in our code is an improvement from our previous examples, however, we still have work to do. Let’s explore how we can make our type checks exhaustive.</p>
+<p>It is important to note that favoring the <code>Result</code> class doesn’t mean that you won’t use <code>try...catch</code> structures. <code>try...catch</code> structures are still required when you are working with external packages.</p>
+<p>If you think the <code>Result</code> class is worth following, you can try encapsulating those touchpoints in modules and using the <code>Result</code> class internally.</p>
+<h1 id="adding-exhaustive-type-checking" tabindex="-1">Adding exhaustive type checking <a class="header-anchor" href="#adding-exhaustive-type-checking">#</a></h1>
+<p>When handing functions that can return multiple errors, it can be helpful to provide type checks for covering all error cases. Doing so ensures that the caller of the function can react dynamically to the type of error, and it provides certainty that no error case is overlooked.</p>
+<p>We can achieve this with an exhaustive switch:</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token comment">// Exhaustive switch helper</span>
+<span class="token keyword">class</span> <span class="token class-name">UnreachableCaseError</span> <span class="token keyword">extends</span> <span class="token class-name">Error</span> <span class="token punctuation">{</span>
+	<span class="token function">constructor</span><span class="token punctuation">(</span>val<span class="token operator">:</span> <span class="token builtin">never</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token keyword">super</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Unreachable case: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>val<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// ...</span>
+
+<span class="token keyword">const</span> weatherResult <span class="token operator">=</span> <span class="token function">getWeather</span><span class="token punctuation">(</span><span class="token string">"Berlin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>weatherResult<span class="token punctuation">.</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token comment">// handle errors</span>
+	<span class="token keyword">const</span> errValue <span class="token operator">=</span> weatherResult<span class="token punctuation">.</span>val<span class="token punctuation">;</span>
+	<span class="token keyword">switch</span> <span class="token punctuation">(</span>errValue<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token keyword">case</span> <span class="token string">"CANT_FETCH_TEMPERATURE"</span><span class="token operator">:</span>
+			<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"getWeather() failed with: CANT_FETCH_TEMPERATURE"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+			<span class="token keyword">break</span><span class="token punctuation">;</span>
+		<span class="token keyword">case</span> <span class="token string">"CANT_FETCH_HUMIDITY"</span><span class="token operator">:</span>
+			<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"getWeather() failed with: CANT_FETCH_HUMIDITY"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+			<span class="token keyword">break</span><span class="token punctuation">;</span>
+		<span class="token keyword">default</span><span class="token operator">:</span>
+			<span class="token comment">// 👇 runtime type check for catching all errors</span>
+			<span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">UnreachableCaseError</span><span class="token punctuation">(</span>errValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Running our weather example with the exhaustive switch will provide compile-time errors under two sets of circumstances. One is when all error cases are not handled, and the other is when the errors in the original function change.</p>
+<h1 id="summary" tabindex="-1">Summary <a class="header-anchor" href="#summary">#</a></h1>
+<p>Now, you know an improved solution for handling common errors in TypeScript! Knowing how important error handling is, I hope you’ll use this method to get the most specific information about any errors in your application.</p>
+<p>In this tutorial, we covered the downsides of some widespread approaches like returning null and the <code>try...catch</code> method. Finally, we learned how to use the TypeScript Result class with an exhaustive switch for error catching.</p>
+
+<ul class="links-nextprev"><li> Previous: <a href="/eleventy-base-blog/blog/2021-07-14_advanced-electron-architecture/">Advanced Electron.js architecture</a></li><li>Next: <a href="/eleventy-base-blog/blog/2021-10-07_node-with-PM2/">Node.js with PM2</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/eleventy-base-blog/blog/2021-08-09_exhaustive-checks/` was built on 2024-09-19T20:58:45.908Z -->
+	</body>
+</html>

@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Dependency boundaries in TypeScript</title>
+		<meta name="description" content="How to keep dependencies under control.">
+
+		<link rel="icon" type="image/png" sizes="196x196" href="/eleventy-base-blog/img/favicon-196.png">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Alain Perkaz">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Alain Perkaz">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono,
+		Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono,
+		Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New,
+		Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #c0c0c0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050f;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #c0c0c0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 40em;
+}
+
+/* prevents images from overflowing parent p in posts */
+p img {
+	width: 100%;
+	height: auto; /* Maintain aspect ratio */
+	max-width: 100%; /* Ensure the image doesn't stretch beyond its original size */
+	display: block; /* Remove inline element gap */
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	/* TODONOW: add different font for code */
+	font-family: var(--font-family-monospace);
+	font-size: 0.9rem !important;
+}
+pre:not([class*="language-"]) {
+	margin: 0.5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 2em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	word-spacing: -0.5px;
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: 0.25em;
+	padding-right: 0.5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: 0.1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/eleventy-base-blog/" class="home-link">Alain Perkaz</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/eleventy-base-blog/">Home</a></li>
+					<li class="nav-item"><a href="/eleventy-base-blog/blog/">Posts</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Dependency boundaries in TypeScript</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2022-09-12">12 September 2022</time></li>
+</ul>
+
+<p>Code projects of reasonable size tend to follow certain principles for abstracting complexity (aka architecture), making them easier to reason about and evolve. There are endless ways of doing so, some common examples being the <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">Model View Controller</a> (MVC) and <a href="https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)">Hexagonal architecture</a>.</p>
+<p>Those abstractions are set as a high-level system design (architectural blueprint), describing the responsibilities of each module and their relations between them (dependencies). The architecture will vary depending on the system's context and requirements, whether real-time data processing backed or a monolithic web application.</p>
+<p>Keeping the day-to-day development aligned with the architecture blueprint can be challenging, especially if the project or organization grows fast. Pull-request reviews, mentoring, documentation, and knowledge sharing help, but it may not be enough.</p>
+<p>In the context of TypeScript, we will discuss the importance of dependencies, the potential pitfalls when unchecked, and propose a solution for keeping the code in sync with the architecture dependency.</p>
+<p>Let's get to it! 💪</p>
+<h2 id="dependencies-in-typescript" tabindex="-1">Dependencies in TypeScript <a class="header-anchor" href="#dependencies-in-typescript">#</a></h2>
+<p>In TypeScript, variables (functions, objects, values) can be imported/exported between files using the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules">ES6 module</a> syntax. Every variable annotated with <code>export</code> will be exported and can be imported using the <code>import</code> syntax.</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token comment">// constants.ts</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> <span class="token constant">USER</span> <span class="token operator">=</span> <span class="token string">"Alain"</span><span class="token punctuation">;</span>
+
+<span class="token comment">// logic.ts</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> <span class="token constant">USER</span> <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"./constants"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">const</span> greet <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">=></span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Hi </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">USER</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">!</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+<span class="token comment">// ui.ts</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> greet <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"./logic"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> html <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;h1></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token function">greet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/h1></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span> <span class="token comment">// &lt;h1>Hi Alain!&lt;/h1></span></code></pre>
+<p>This enables breaking up the functionality into modules, which can be organized following an architectural blueprint. It's important to note that importing local files and local or remote packages is possible, such as the ones available through <code>npm</code>.</p>
+<p>This module syntax allows for great flexibility, imposing no restrictions on what can be exported or imported from anywhere. The dependency graphs are implicitly defined across the app.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/yFV0XC496y-2134.avif 2134w"><source type="image/webp" srcset="/eleventy-base-blog/img/yFV0XC496y-2134.webp 2134w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/yFV0XC496y-2134.png" width="2134" height="1188"></picture></p>
+<p>As a project develops, that implicit dependency graph can grow unchecked, leading to some pitfalls.</p>
+<h2 id="pitfalls-of-unchecked-dependency-management" tabindex="-1">Pitfalls of unchecked dependency management <a class="header-anchor" href="#pitfalls-of-unchecked-dependency-management">#</a></h2>
+<p>One of the pitfalls of unchecked dependencies is that any program module can import and create a dependency towards any method exported within the codebase. Private and helper methods can be referenced out of their module, so keeping a public API of a module requires constant manual supervision.</p>
+<p>Another pitfall is the freedom to import any third-party package. Third-party modules are great, as they can boost the development speed and avoid reinventing the wheel. On the flip side, too many dependencies can expose a project to security issues (due to outdated packages), conflicts between packages, and huge bundle sizes 😬</p>
+<p>The third and main issue is that there is no way of programmatically enforcing or verifying that the code follows the architecture's dependency rules. Over time, the blueprint and implementation can grow apart to an extent where the reference architecture is not valid anymore.</p>
+<p>This can void the intrinsic characteristics of an architecture, such as the separation between the view and controllers (containing the business logic) in MVC. It can make the business logic hard to test and reduces the ability to iterate the UI without breaking the business logic.</p>
+<p>In the next section, we will look into how to make the dependencies explicit so that module internals can remain private, 3rd party dependencies kept under control and the architecture in sync with the code! 🔁</p>
+<h2 id="adding-explicit-dependencies" tabindex="-1">Adding explicit dependencies <a class="header-anchor" href="#adding-explicit-dependencies">#</a></h2>
+<p>To make the dependencies between modules explicit and set restrictive dependency rules, we'll use the <a href="https://github.com/smikula/good-fences">good-fences</a> package.</p>
+<p>This package enables creating and enforcing boundaries in TypeScript projects and can significantly help mitigate the pitfalls described above. Let's see how we can use the package through an example!</p>
+<p>In order to ensure that the implementation of the project matches and, over time, maintains the planned dependency graph, we will leverage the concept of fences (provided by the packages <code>good-fences</code>).</p>
+<p>A fence defines how a module can interact with other modules and fenced directories and is created by adding a <code>fence.json</code> file to a TypeScript directory. Fences only restrict what goes through them (import, export, external dependencies), so within a fenced directory, there are no module import restrictions. Fences can also be tagged so they can be referenced from other fence configurations.</p>
+<h2 id="a-practical-example" tabindex="-1">A practical example <a class="header-anchor" href="#a-practical-example">#</a></h2>
+<p>The code is available in the <a href="https://github.com/aperkaz/code-boundaries">following repo</a>.</p>
+<p>For the sake of an example, we'll use a simple React app, which follows the architecture of a store-driven UI, similar to React's <a href="https://www.howtogeek.com/devops/what-are-presentational-and-container-components-in-react/">presentational component pattern</a>. The app provides the calculation of the nth number of the <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci</a> or <a href="https://en.wikipedia.org/wiki/Pell_number">Pell</a> series (I said it was a simple app 😅).</p>
+<p>The UI does not have access to the business-logic methods in the app, as they are abstracted behind the store. In addition, the business-logic code does not depend on any UI code, so the UI can evolve without touching the business logic.</p>
+<p>The dependency graph between modules is as follows. Note that the dependency between modules is marked with an arrow, the internal modules are colored grey, and the external packages are blue.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/jZpsGFPA21-2090.avif 2090w"><source type="image/webp" srcset="/eleventy-base-blog/img/jZpsGFPA21-2090.webp 2090w"><img alt="Image" loading="lazy" decoding="async" src="/eleventy-base-blog/img/jZpsGFPA21-2090.png" width="2090" height="1188"></picture></p>
+<p>To implement the schema above, we will create three different fenced directories: <code>math</code>, <code>store</code>, and <code>ui</code>. Each directory maps to one of the modules in the schema.</p>
+<p>In order to prevent other modules from reaching into the implementation details (or types) of either module, each fenced directory only allows imports from the <code>index.ts</code> files. Implementation details and helper utils remain safe to change as long as the public APIs defined on the <code>index.ts</code> files are not modified.</p>
+<p>Also, to prevent circular or unwanted dependencies (for example, the <code>ui</code> depending on the <code>logic</code> directly), each fence is tagged and defines which other fences it can import from.</p>
+<p>Finally, to mitigate the issue of unchecked third-party imports, each fence will expressly declare which third-party packages allow imports. New package additions will require modifying the <code>fence.json</code> files, making those dependencies explicit.</p>
+<p>The fence configurations for our project are as follows:</p>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token comment">// ./math/fence.json</span>
+<span class="token punctuation">{</span>
+  <span class="token property">"tags"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"math-module"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"exports"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"index"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"imports"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"dependencies"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// ./store/fence.json</span>
+<span class="token punctuation">{</span>
+  <span class="token property">"tags"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"store-module"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"exports"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"index"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"imports"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"math-module"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"dependencies"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"react-redux"</span><span class="token punctuation">,</span> <span class="token string">"@reduxjs/toolkit"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// ./ui/fence.json</span>
+<span class="token punctuation">{</span>
+  <span class="token property">"tags"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"ui-module"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"imports"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"store-module"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"dependencies"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"react"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>For an in-depth explanation of the fence configuration options, you can check the <a href="https://github.com/smikula/good-fences">official documentation</a>.</p>
+<p>All those rules can be checked programmatically by running the <code>good-fences</code> npm package, pointing towards the <code>tsconfig.json</code> file of the project (<code>yarn good-fences</code> on the project).</p>
+<p>You can now run the checks as part of your CI/CD pipelines or as commit hooks! 🎉</p>
+<h2 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h2>
+<p>Thanks for sticking until the end!</p>
+<p>Proper dependency management and following the architectural design during implementation are vital aspects of a healthy and maintainable codebase.</p>
+<p><code>good-fences</code> is not a silver bullet for this complex topic but rather a great tool to have at hand. As your project grows, it is easy to automate manual dependency-rule checking and encourages the team to be intentional about dependencies (I think this is a great idea!).</p>
+<p>The code is available in the <a href="https://github.com/aperkaz/code-boundaries">following repo</a>; feel free to change and explore it further.</p>
+<p>Happy coding! 🚀</p>
+
+<ul class="links-nextprev"><li> Previous: <a href="/eleventy-base-blog/blog/2022-03-03_typing-date-strings/">Date-strings in TypeScript</a></li><li>Next: <a href="/eleventy-base-blog/blog/2023-03-01_typing-css-modules/">Typing CSS Modules</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/eleventy-base-blog/blog/2022-09-12_dependency-boundaries/` was built on 2024-09-19T20:58:45.910Z -->
+	</body>
+</html>

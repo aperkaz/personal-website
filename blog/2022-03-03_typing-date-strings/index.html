@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Date-strings in TypeScript</title>
+		<meta name="description" content="How to handle date-strings safely in TypeScript.">
+
+		<link rel="icon" type="image/png" sizes="196x196" href="/eleventy-base-blog/img/favicon-196.png">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Alain Perkaz">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Alain Perkaz">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono,
+		Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono,
+		Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New,
+		Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #c0c0c0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050f;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #c0c0c0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 40em;
+}
+
+/* prevents images from overflowing parent p in posts */
+p img {
+	width: 100%;
+	height: auto; /* Maintain aspect ratio */
+	max-width: 100%; /* Ensure the image doesn't stretch beyond its original size */
+	display: block; /* Remove inline element gap */
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	/* TODONOW: add different font for code */
+	font-family: var(--font-family-monospace);
+	font-size: 0.9rem !important;
+}
+pre:not([class*="language-"]) {
+	margin: 0.5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 2em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	word-spacing: -0.5px;
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: 0.25em;
+	padding-right: 0.5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: 0.1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/eleventy-base-blog/" class="home-link">Alain Perkaz</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/eleventy-base-blog/">Home</a></li>
+					<li class="nav-item"><a href="/eleventy-base-blog/blog/">Posts</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Date-strings in TypeScript</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2022-03-03">03 March 2022</time></li>
+</ul>
+
+<p>Lately, I have had to deal with multiple custom representations of dates as strings in one of my projects, such as <code>YYYY-MM-DD</code> and <code>YYYYMMDD</code>.</p>
+<p>Since those dates are string variables, TypeScript infers the <code>string</code> type by default.
+This is not wrong, but such type definition is broad, making working effectively with those date-strings hard.</p>
+<p><code>const dog = 'alfie'</code> is also inferred as a <code>string</code> type! 🤔</p>
+<p>Here is how I approached the typing of those date strings to improve the developer experience and reduce the surface for bugs! 🐞</p>
+<p><strong>TL:DR</strong>; the recipe on how to type date stings is available in <a href="https://gist.github.com/aperkaz/580e72b98eba5afac30549387562655d">this Gist</a>.</p>
+<h1 id="some-context-first" tabindex="-1">Some context first... <a class="header-anchor" href="#some-context-first">#</a></h1>
+<p>Before jumping into the code, I would like to briefly mention the TypeScript features leveraged to achieve the goal: <a href="https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html">template literal types</a> and <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates">narrowing through type predicates</a>.</p>
+<h2 id="template-literal-types" tabindex="-1">Template literal types <a class="header-anchor" href="#template-literal-types">#</a></h2>
+<p>Introduced in TypeScript 4.1, they share the syntax with JavaScript template literals but are used as types.</p>
+<p>The type template literals resolve to a union of all the string combinations for a given template. This may sound a little abstract, so let's see it in action:</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">type</span> <span class="token class-name">Person</span> <span class="token operator">=</span> <span class="token string">'Jeff'</span> <span class="token operator">|</span> <span class="token string">'Maria'</span>
+<span class="token keyword">type</span> <span class="token class-name">Greeting</span> <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">hi </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>Person<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">!</span><span class="token template-punctuation string">`</span></span> <span class="token comment">// 👈  Template literal type</span>
+
+<span class="token class-name"><span class="token keyword">const</span></span> validGreeting<span class="token operator">:</span> Greeting <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">hi Jeff!</span><span class="token template-punctuation string">`</span></span> <span class="token comment">// ✅</span>
+<span class="token comment">// 👆 note that the type of `validGreeting` is the union `"hi Jeff!" | "hi Maria!`</span>
+
+<span class="token keyword">const</span> invalidGreeting<span class="token operator">:</span> Greeting <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">bye Jeff!</span><span class="token template-punctuation string">`</span></span> <span class="token comment">// ❌</span>
+<span class="token comment">// Type '"bye Jeff!"' is not assignable to type '"hi Jeff!" | "hi Maria!"</span></code></pre>
+<p>This feature is very powerful, as you can perform generic type operations over those types.
+For example, <a href="https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#capitalizestringtype">capilatization</a>:</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">type</span> <span class="token class-name">Person</span> <span class="token operator">=</span> <span class="token string">'Jeff'</span> <span class="token operator">|</span> <span class="token string">'Maria'</span>
+<span class="token keyword">type</span> <span class="token class-name">Greeting</span> <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">hi </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>Person<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">!</span><span class="token template-punctuation string">`</span></span>
+<span class="token keyword">type</span> <span class="token class-name">LoudGreeting</span> <span class="token operator">=</span> Uppercase<span class="token operator">&lt;</span>Greeting<span class="token operator">></span> <span class="token comment">// 👈  Capitalization of template literal type</span>
+
+<span class="token class-name"><span class="token keyword">const</span></span> validGreeting<span class="token operator">:</span> LoudGreeting <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">HI JEFF!</span><span class="token template-punctuation string">`</span></span> <span class="token comment">// ✅</span>
+
+<span class="token keyword">const</span> invalidGreeting<span class="token operator">:</span> LoudGreeting <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">hi jeff!</span><span class="token template-punctuation string">`</span></span> <span class="token comment">// ❌</span>
+<span class="token comment">// Type '"hi Jeff!"' is not assignable to type '"HI JEFF!" | "HI MARIA!"</span></code></pre>
+<h2 id="type-predicate-narrowing" tabindex="-1">Type predicate narrowing <a class="header-anchor" href="#type-predicate-narrowing">#</a></h2>
+<p>TypeScript does a phenomenal job at narrowing types, for example, in the following example:</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">let</span> age<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">|</span> <span class="token builtin">number</span> <span class="token operator">=</span> <span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// `age` is of type `string` | `number`</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> age <span class="token operator">===</span> <span class="token string">'number'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// `age` is narrowed to type `number`</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+  <span class="token comment">// `age` is narrowed to type `string`</span>
+<span class="token punctuation">}</span></code></pre>
+<p>That said, when dealing with custom types, it can be helpful to tell the TypeScript compiler how to perform the narrowing.
+For example, when we want to narrow to a type after performing a runtime validation.</p>
+<p>Here is where the type predicate narrowing (aka user-defined type guards) comes in handy!</p>
+<p>In the following example, the <code>isDog</code> type-guard helps narrow down the types for the <code>animal</code> variable by checking the type property:</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">type</span> <span class="token class-name">Dog</span> <span class="token operator">=</span> <span class="token punctuation">{</span> type<span class="token operator">:</span> <span class="token string">'dog'</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">type</span> <span class="token class-name">Horse</span> <span class="token operator">=</span> <span class="token punctuation">{</span> type<span class="token operator">:</span> <span class="token string">'horse'</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 👇 custom type guard, `pet is Dog` is the type predicate</span>
+<span class="token keyword">function</span> <span class="token function">isDog</span><span class="token punctuation">(</span>pet<span class="token operator">:</span> Dog <span class="token operator">|</span> Horse<span class="token punctuation">)</span><span class="token operator">:</span> pet <span class="token keyword">is</span> Dog <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> pet<span class="token punctuation">.</span>type <span class="token operator">===</span> <span class="token string">'dog'</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">let</span> animal<span class="token operator">:</span> Dog <span class="token operator">|</span> Horse <span class="token operator">=</span> <span class="token function">getAnimal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// `animal` is of type `Dog` | `Horse`</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isDog</span><span class="token punctuation">(</span>animal<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// `animal` is narrowed to type `Dog`</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+  <span class="token comment">// `animal` is narrowed to type `Horse`</span>
+<span class="token punctuation">}</span></code></pre>
+<h1 id="typing-the-date-strings" tabindex="-1">Typing the date-strings <a class="header-anchor" href="#typing-the-date-strings">#</a></h1>
+<p>Now that we presented the TypeScript building blocks, let's bulletproof our date strings! 🚀
+For the sake of brevity, this example will only contain the code for <code>YYYYMMDD</code> date strings.</p>
+<p>All the code is available in the <a href="https://gist.github.com/aperkaz/580e72b98eba5afac30549387562655d">following Gist</a>.</p>
+<p>First, we'll need to define the template literal types to represent the union of all the date-like stings:</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">type</span> <span class="token class-name">oneToNine</span> <span class="token operator">=</span> <span class="token number">1</span><span class="token operator">|</span><span class="token number">2</span><span class="token operator">|</span><span class="token number">3</span><span class="token operator">|</span><span class="token number">4</span><span class="token operator">|</span><span class="token number">5</span><span class="token operator">|</span><span class="token number">6</span><span class="token operator">|</span><span class="token number">7</span><span class="token operator">|</span><span class="token number">8</span><span class="token operator">|</span><span class="token number">9</span>
+<span class="token keyword">type</span> <span class="token class-name">zeroToNine</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token operator">|</span><span class="token number">1</span><span class="token operator">|</span><span class="token number">2</span><span class="token operator">|</span><span class="token number">3</span><span class="token operator">|</span><span class="token number">4</span><span class="token operator">|</span><span class="token number">5</span><span class="token operator">|</span><span class="token number">6</span><span class="token operator">|</span><span class="token number">7</span><span class="token operator">|</span><span class="token number">8</span><span class="token operator">|</span><span class="token number">9</span>
+
+<span class="token comment">/**
+ * Years
+ */</span>
+<span class="token keyword">type</span> <span class="token class-name"><span class="token constant">YYYY</span></span> <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">19</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>zeroToNine<span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>zeroToNine<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token operator">|</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">20</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>zeroToNine<span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>zeroToNine<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span>
+<span class="token comment">/**
+ * Months
+ */</span>
+<span class="token keyword">type</span> <span class="token class-name"><span class="token constant">MM</span></span> <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">0</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>oneToNine<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token operator">|</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">1</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token number">0</span><span class="token operator">|</span><span class="token number">1</span><span class="token operator">|</span><span class="token number">2</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span>
+<span class="token comment">/**
+ * Days
+ */</span>
+<span class="token keyword">type</span> <span class="token class-name"><span class="token constant">DD</span></span> <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token number">0</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>oneToNine<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token operator">|</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token number">1</span><span class="token operator">|</span><span class="token number">2</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>zeroToNine<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span> <span class="token operator">|</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">3</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token number">0</span><span class="token operator">|</span><span class="token number">1</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span>
+
+<span class="token comment">/**
+ * YYYYMMDD
+ */</span>
+<span class="token keyword">type</span> <span class="token class-name">RawDateString</span> <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">YYYY</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">MM</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">DD</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> date<span class="token operator">:</span> RawDateString <span class="token operator">=</span> <span class="token string">'19990223'</span> <span class="token comment">// ✅</span>
+<span class="token keyword">const</span> dateInvalid<span class="token operator">:</span> RawDateString <span class="token operator">=</span> <span class="token string">'19990231'</span> <span class="token comment">//✅ 31st of February is not a valid date, but the template literal doesnt know!</span>
+<span class="token keyword">const</span> dateWrong<span class="token operator">:</span> RawDateString <span class="token operator">=</span> <span class="token string">'19990299'</span> <span class="token comment">// ❌ Type error, 99 is not a valid day</span></code></pre>
+<p>As you saw in the example above, the template literal types help specify the shape of date-strings, but there is no actual validation for those dates.
+That's why the compiler flags <code>19990231</code> as a valid date (even if it is not), as it fulfils the type of the template 😢</p>
+<p>Also, when inspecting the variables above (<code>date</code>, <code>dateInvalid</code> and <code>dateWrong</code>), you will find that the editor displays the union of all valid strings for those template literals.</p>
+<p>While useful, I prefer setting <a href="https://michalzalecki.com/nominal-typing-in-typescript/#approach-4-intersection-types-and-brands">nominal typing</a>, so that the type for valid date-string is <code>DateString</code> instead of <code>&quot;19000101&quot; | &quot;19000102&quot; | &quot;19000103&quot; | ...</code>.</p>
+<p>The nominal type will also come in handy when adding user-defined type guards.</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">type</span> <span class="token class-name">Brand<span class="token operator">&lt;</span><span class="token constant">K</span><span class="token punctuation">,</span> <span class="token constant">T</span><span class="token operator">></span></span> <span class="token operator">=</span> <span class="token constant">K</span> <span class="token operator">&amp;</span> <span class="token punctuation">{</span> __brand<span class="token operator">:</span> <span class="token constant">T</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">type</span> <span class="token class-name">DateString</span> <span class="token operator">=</span> Brand<span class="token operator">&lt;</span>RawDateString<span class="token punctuation">,</span> <span class="token string">'DateString'</span><span class="token operator">></span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> aDate<span class="token operator">:</span> DateString <span class="token operator">=</span> <span class="token string">'19990101'</span><span class="token punctuation">;</span> <span class="token comment">// ❌</span>
+<span class="token comment">// Type 'string' is not assignable to type 'DateString'</span></code></pre>
+<p>To ensure that our <code>DateString</code> type also represents valid dates, well set up a user-defined type guard to validate the dates and narrow the types.</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token comment">/**
+ * Use `moment`, `luxon` or other date library
+ */</span>
+<span class="token keyword">const</span> isValidDate <span class="token operator">=</span> <span class="token punctuation">(</span>str<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">boolean</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token comment">// ...</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 👇 User-defined type guard</span>
+<span class="token keyword">function</span> <span class="token function">isValidDateString</span><span class="token punctuation">(</span>str<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">)</span><span class="token operator">:</span> str <span class="token keyword">is</span> DateString <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> str<span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^\d{4}\d{2}\d{2}$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token keyword">null</span> <span class="token operator">&amp;&amp;</span> <span class="token function">isValidDate</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Awesome, now let's see the date string types in a couple of examples:</p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token comment">/**
+ *  👇 Usage in type narrowing
+ */</span>
+
+<span class="token comment">// 1️⃣ valid string format, valid date</span>
+<span class="token keyword">const</span> date<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'19990223'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isValidDateString</span><span class="token punctuation">(</span>date<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// evaluates to true, `date` is narrowed to type `DateString` ✅</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 2️⃣ valid string format, invalid date (February doenst have 31 days)</span>
+<span class="token keyword">const</span> dateWrong<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'19990231'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isValidDateString</span><span class="token punctuation">(</span>dateWrong<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// evaluates to false, `dateWrong` is not a valid date, even if its shape is YYYYMMDD ❌</span>
+<span class="token punctuation">}</span></code></pre>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token comment">/**
+ *  👇 Usage in factory function
+ */</span>
+
+<span class="token keyword">function</span> <span class="token function">toDateString</span><span class="token punctuation">(</span>str<span class="token operator">:</span> RawDateString<span class="token punctuation">)</span><span class="token operator">:</span> DateString <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isValidDateString</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span> str<span class="token punctuation">;</span>
+  <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">Error</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Invalid date string: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>str<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 1️⃣ valid string format, valid date</span>
+<span class="token keyword">const</span> date1 <span class="token operator">=</span> <span class="token function">toDateString</span><span class="token punctuation">(</span><span class="token string">'19990211'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// `date1`, is of type `DateString`</span>
+
+<span class="token comment">// 2️⃣ invalid string format</span>
+<span class="token keyword">const</span> date2 <span class="token operator">=</span> <span class="token function">toDateString</span><span class="token punctuation">(</span><span class="token string">'asdf'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// ❌ Type error: Argument of type '"asdf"' is not assignable to parameter of type '"19000101" | ...</span>
+
+<span class="token comment">// 3️⃣ valid string format, invalid date (February doenst have 31 days)</span>
+<span class="token keyword">const</span> date3 <span class="token operator">=</span> <span class="token function">toDateString</span><span class="token punctuation">(</span><span class="token string">'19990231'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// ❌ Throws Error: Invalid date string: 19990231</span></code></pre>
+<h1 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h1>
+<p>Thanks for sticking to the end! 🎉</p>
+<p>I hope this article shared some light on what TypeScript is capable of in the context of typing custom strings. Remember that this approach is also applicable to other custom strings, such as custom user-ids <code>user-XXXX</code>, and other date-strings <code>YYYY-MM-DD</code>.</p>
+<p>The possibilities are endless when combining user-defined type guards, template literal strings, and nominals typings 😉</p>
+
+<ul class="links-nextprev"><li> Previous: <a href="/eleventy-base-blog/blog/2021-11-17_serverless-stripe-payments/">Serverless payments with Netlify and Stripe</a></li><li>Next: <a href="/eleventy-base-blog/blog/2022-09-12_dependency-boundaries/">Dependency boundaries in TypeScript</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/eleventy-base-blog/blog/2022-03-03_typing-date-strings/` was built on 2024-09-19T20:58:45.909Z -->
+	</body>
+</html>

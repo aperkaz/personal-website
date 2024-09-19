@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Better Express APIs with OpenAPI</title>
+		<meta name="description" content="How to Build Better APIs in Express with OpenAPI.">
+
+		<link rel="icon" type="image/png" sizes="196x196" href="/eleventy-base-blog/img/favicon-196.png">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Alain Perkaz">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Alain Perkaz">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono,
+		Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono,
+		Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New,
+		Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #c0c0c0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050f;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #c0c0c0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 40em;
+}
+
+/* prevents images from overflowing parent p in posts */
+p img {
+	width: 100%;
+	height: auto; /* Maintain aspect ratio */
+	max-width: 100%; /* Ensure the image doesn't stretch beyond its original size */
+	display: block; /* Remove inline element gap */
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	/* TODONOW: add different font for code */
+	font-family: var(--font-family-monospace);
+	font-size: 0.9rem !important;
+}
+pre:not([class*="language-"]) {
+	margin: 0.5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 2em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	word-spacing: -0.5px;
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: 0.25em;
+	padding-right: 0.5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: 0.1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/eleventy-base-blog/" class="home-link">Alain Perkaz</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/eleventy-base-blog/">Home</a></li>
+					<li class="nav-item"><a href="/eleventy-base-blog/blog/">Posts</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Better Express APIs with OpenAPI</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2021-04-02">02 April 2021</time></li>
+</ul>
+
+<p>In this article, I will share how to build robust REST APIs in Express. First, I will present some of the challenges of building REST APIs and then propose a solution using open standards.</p>
+<p>This article won't be an introduction to <a href="https://nodejs.org/en/">Node.js</a>, <a href="https://expressjs.com/">Express.js</a>, or <a href="https://www.freecodecamp.org/news/rest-apis/">REST APIs</a>. Make sure to check out the links before diving deeper if you need a refresher. 🤿</p>
+<p>I love the Node.js ecosystem due to its flexibility and ease of use. The community is vibrant, and in a matter of minutes, you can setup a REST API using the language you already know.</p>
+<p>There is great value in sharing the same programming language between an application's back-end and front-end. This makes it easier to navigate the codebase of an application with less <a href="https://blog.rescuetime.com/context-switching/">context switching</a>. Full-stack developers can move across the stack quickly, and <a href="https://betterprogramming.pub/sharing-logic-components-between-frontend-and-backend-repositories-6fdc1f9cb850">sharing code</a> becomes a breeze.</p>
+<p>That said, as MVPs grow into full-blown production applications and development teams scale, this flexibility creates challenges too.</p>
+<br>
+<h2 id="challenges-of-working-with-rest-apis" tabindex="-1">Challenges of Working with REST APIs <a class="header-anchor" href="#challenges-of-working-with-rest-apis">#</a></h2>
+<p>There are many challenges to face when codebases and teams grow, regardless of which tech stack you use.</p>
+<p>I'll narrow these challenges down to Express.js apps which contain business logic exposed over a REST API.</p>
+<p>Regardless of the nature of the API consumers (webpages, mobile apps, third-party backends), they are likely to face one (or more) of the following challenges as they grow:</p>
+<h3 id="1-it-s-harder-to-make-changes" tabindex="-1">1. ☠️ It's harder to make changes <a class="header-anchor" href="#1-it-s-harder-to-make-changes">#</a></h3>
+<p>When the contract is not explicit, making changes on either side of the REST API becomes harder.</p>
+<p>For example, you may have a REST endpoint that returns a specific user's name. In the upcoming feature, you may need to modify it to return the age too. This may silently break the web application and mobile app.</p>
+<p>You can set up integration tests to mitigate this issue, but you will still heavily rely on the developers to manually cover all the edge cases. This takes lots of time and effort, and you are never 100% certain that the changes won't break the app.</p>
+<h3 id="2-lack-of-updated-documentation" tabindex="-1">2. 📜 Lack of (updated) documentation <a class="header-anchor" href="#2-lack-of-updated-documentation">#</a></h3>
+<p>Documentation is another sensitive topic when building REST APIs. I am a firm believer that, in most cases, the code should serve as enough documentation.</p>
+<p>That said, REST APIs can grow in complexity, and checking the security, parameters, and possible responses for each endpoint in the code becomes tedious and time-consuming. This slows down the speed of development, and bugs creep into the system.</p>
+<p>Even if the team is committed to manually keeping the documentation up to date in a separate document from the code, it's hard to be 100% certain that it reflects the code.</p>
+<h3 id="3-public-apis" tabindex="-1">3. 📢 Public APIs <a class="header-anchor" href="#3-public-apis">#</a></h3>
+<p>This won't apply to all apps, but an application may need to expose a set of functionalities to a third party in some cases. When doing so, the third party may build core functionalities on top of our exposed APIs.</p>
+<p>This means that we can't modify those APIs at the same rate that we update our private APIs. The third-party application may break, and that's something we should avoid at all costs.</p>
+<p>What the public APIs expose should be explicit and simple to develop against, to limit the amount of back and forth communication needed between internal and external developer teams.</p>
+<h3 id="4-manual-integration-tests" tabindex="-1">4. ✍️ Manual integration tests <a class="header-anchor" href="#4-manual-integration-tests">#</a></h3>
+<p>When applications grow organically without a thorough plan, the chances are high that what the API provides and what the API consumer expects is buried deep into the code.</p>
+<p>This is not a big problem when you have a small number of endpoints for internal use. But as the API surface grows, modifying existing endpoints requires following breadcrumbs across the whole system to ensure that what the consumer expects to receive is equal to what's provided.</p>
+<p>This can be mitigated by keeping integration tests between the parts of the system that talk to the REST API. But doing it manually is tremendous work and when done poorly, provides false security that the system will work properly.</p>
+<br>
+<h2 id="proposed-solution" tabindex="-1">Proposed solution <a class="header-anchor" href="#proposed-solution">#</a></h2>
+<p>We have seen some of the inherent challenges that come with building REST APIs. In the following section we will build an example Express project that addresses those challenges using open standards.</p>
+<h3 id="api-standard-specification" tabindex="-1">API standard specification <a class="header-anchor" href="#api-standard-specification">#</a></h3>
+<p>The challenges described in the previous section have been around for a long time, so it pays off to look into existing solutions, instead of re-inventing the wheel.</p>
+<p>There have been multiple attempts to standardize REST API definitions (<a href="https://raml.org/">RAML</a>, <a href="https://jsonapi.org/">JsonAPI</a>, <a href="https://www.openapis.org/">OpenAPI</a>...). These projects have the shared goal making it easier for developers to define how their APIs behave, so servers and clients across multiple languages can 'speak a common language'.</p>
+<p>Having some sort of formal specification of the API solves many of the challenges, since in many cases, client SDKs, tests, mock servers and documentation can be auto generated from those specifications.</p>
+<p>One of my favorites is OpenAPI (formerly Swagger). It has a big community, and plenty of tooling for Express. This may not the be the best tool for every REST API project out there, so remember to do some extra research to make sure the tooling and support around the said specification makes sense in your case.</p>
+<h3 id="context-for-our-example" tabindex="-1">Context for our example <a class="header-anchor" href="#context-for-our-example">#</a></h3>
+<p>For the sake of this example, let's suppose we are building a todo list management app. The user has access to a web app where they can fetch, create, edit and delete todos, which are persisted in the backend.</p>
+<p>In this case, the backend will be an Express.js app that will expose over a REST API the following functionalities:</p>
+<ul>
+<li>Fetch todos: <code>[GET] /todos</code></li>
+<li>Create a todo: <code>[POST] /todos</code></li>
+<li>Edit a todo: <code>[PUT] /todos/:id</code></li>
+<li>Delete a todo: <code>[DELETE] /todos/:id</code></li>
+</ul>
+<p>This is an over-simplification of the functionalities that a todo management app will need, but will serve to show how we can overcome the challenges presented above in a real context.</p>
+<h3 id="implementation" tabindex="-1">Implementation <a class="header-anchor" href="#implementation">#</a></h3>
+<p>Great, now that we have introduced open standards for API definitions and a context, let's implement an Express todos app tackling the previous challenges.</p>
+<p>We will be using an OpenAPI with the Express library <a href="https://github.com/kogosoftwarellc/open-api/tree/master/packages/express-openapi"><strong>express-openapi</strong></a>. Note that this library provides advanced functionalities (response validation, authentication, middleware setup...) beyond the scope of this post.</p>
+<p>The complete code is available in <a href="https://github.com/aperkaz/express-open-api"><strong>this repository</strong></a>.</p>
+<h4 id="1-initialize-a-express-skeleton-and-initialize-a-git-repo" tabindex="-1">1. Initialize a Express skeleton and initialize a Git repo: <a class="header-anchor" href="#1-initialize-a-express-skeleton-and-initialize-a-git-repo">#</a></h4>
+<pre class="language-bash" tabindex="0"><code class="language-bash">npx express-generator --no-view <span class="token parameter variable">--git</span> todo-app
+<span class="token builtin class-name">cd</span> ./todo-app
+<span class="token function">git</span> init
+<span class="token function">git</span> <span class="token function">add</span> <span class="token builtin class-name">.</span><span class="token punctuation">;</span> <span class="token function">git</span> commit <span class="token parameter variable">-m</span> <span class="token string">"Initial commit"</span><span class="token punctuation">;</span></code></pre>
+<h4 id="2-add-the-openapi-express-library-express-openapi" tabindex="-1">2. Add the OpenAPI Express library, <a href="https://github.com/kogosoftwarellc/open-api/tree/master/packages/express-openapi"><strong>express-openapi</strong></a>: <a class="header-anchor" href="#2-add-the-openapi-express-library-express-openapi">#</a></h4>
+<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">npm</span> i express-openapi <span class="token parameter variable">-s</span></code></pre>
+<p><em><code>📁 app.js</code></em></p>
+<pre class="language-js" tabindex="0"><code class="language-js">app<span class="token punctuation">.</span><span class="token function">listen</span><span class="token punctuation">(</span><span class="token number">3030</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// OpenAPI routes</span>
+<span class="token function">initialize</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+	app<span class="token punctuation">,</span>
+	<span class="token literal-property property">apiDoc</span><span class="token operator">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">"./api/api-doc"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+	<span class="token literal-property property">paths</span><span class="token operator">:</span> <span class="token string">"./api/paths"</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> app<span class="token punctuation">;</span></code></pre>
+<h4 id="3-add-openapi-base-schema" tabindex="-1">3. Add OpenAPI base schema. <a class="header-anchor" href="#3-add-openapi-base-schema">#</a></h4>
+<p>Note that the schema defines the type of a <strong>Todo</strong>, which will be referenced in the route handlers.</p>
+<p><em><code>📁 api/api-doc.js</code></em></p>
+<pre class="language-js" tabindex="0"><code class="language-js"><span class="token keyword">const</span> apiDoc <span class="token operator">=</span> <span class="token punctuation">{</span>
+	<span class="token literal-property property">swagger</span><span class="token operator">:</span> <span class="token string">"2.0"</span><span class="token punctuation">,</span>
+	<span class="token literal-property property">basePath</span><span class="token operator">:</span> <span class="token string">"/"</span><span class="token punctuation">,</span>
+	<span class="token literal-property property">info</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+		<span class="token literal-property property">title</span><span class="token operator">:</span> <span class="token string">"Todo app API."</span><span class="token punctuation">,</span>
+		<span class="token literal-property property">version</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span><span class="token punctuation">,</span>
+	<span class="token punctuation">}</span><span class="token punctuation">,</span>
+	<span class="token literal-property property">definitions</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+		<span class="token literal-property property">Todo</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+			<span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+			<span class="token literal-property property">properties</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+				<span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+					<span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">"number"</span><span class="token punctuation">,</span>
+				<span class="token punctuation">}</span><span class="token punctuation">,</span>
+				<span class="token literal-property property">message</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+					<span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+				<span class="token punctuation">}</span><span class="token punctuation">,</span>
+			<span class="token punctuation">}</span><span class="token punctuation">,</span>
+			<span class="token literal-property property">required</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"id"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+		<span class="token punctuation">}</span><span class="token punctuation">,</span>
+	<span class="token punctuation">}</span><span class="token punctuation">,</span>
+	<span class="token literal-property property">paths</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> apiDoc<span class="token punctuation">;</span></code></pre>
+<h4 id="4-add-route-handlers" tabindex="-1">4. Add route <a href="https://github.com/kogosoftwarellc/open-api/tree/master/packages/express-openapi#getting-started">handlers</a>: <a class="header-anchor" href="#4-add-route-handlers">#</a></h4>
+<p>Each handler declares which operations it supports (GET, POST...), the callbacks for each operation, and the apiDoc OpenAPI schema for that handler.</p>
+<p><em><code>📁 api/paths/todos/index.js</code></em></p>
+<pre class="language-js" tabindex="0"><code class="language-js">module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">let</span> operations <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token constant">GET</span><span class="token punctuation">,</span>
+    <span class="token constant">POST</span><span class="token punctuation">,</span>
+    <span class="token constant">PUT</span><span class="token punctuation">,</span>
+    <span class="token constant">DELETE</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">function</span> <span class="token constant">GET</span><span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res<span class="token punctuation">,</span> next</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    res<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
+      <span class="token punctuation">{</span> <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token literal-property property">message</span><span class="token operator">:</span> <span class="token string">'First todo'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span> <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token literal-property property">message</span><span class="token operator">:</span> <span class="token string">'Second todo'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">function</span> <span class="token constant">POST</span><span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res<span class="token punctuation">,</span> next</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">About to create todo: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>body<span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    res<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token number">201</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">function</span> <span class="token constant">PUT</span><span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res<span class="token punctuation">,</span> next</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">About to update todo id: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>id<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    res<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">function</span> <span class="token constant">DELETE</span><span class="token punctuation">(</span><span class="token parameter">req<span class="token punctuation">,</span> res<span class="token punctuation">,</span> next</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">About to delete todo id: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>id<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    res<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token constant">GET</span><span class="token punctuation">.</span>apiDoc <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">summary</span><span class="token operator">:</span> <span class="token string">'Fetch todos.'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">operationId</span><span class="token operator">:</span> <span class="token string">'getTodos'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">responses</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token number">200</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token literal-property property">description</span><span class="token operator">:</span> <span class="token string">'List of todos.'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">schema</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'array'</span><span class="token punctuation">,</span>
+          <span class="token literal-property property">items</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+            \$ref<span class="token operator">:</span> <span class="token string">'#/definitions/Todo'</span><span class="token punctuation">,</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+  <span class="token constant">POST</span><span class="token punctuation">.</span>apiDoc <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">summary</span><span class="token operator">:</span> <span class="token string">'Create todo.'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">operationId</span><span class="token operator">:</span> <span class="token string">'createTodo'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">consumes</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'application/json'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">parameters</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token keyword">in</span><span class="token operator">:</span> <span class="token string">'body'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'todo'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">schema</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token literal-property property">$ref</span><span class="token operator">:</span> <span class="token string">'#/definitions/Todo'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">responses</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token number">201</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token literal-property property">description</span><span class="token operator">:</span> <span class="token string">'Created'</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+  <span class="token constant">PUT</span><span class="token punctuation">.</span>apiDoc <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">summary</span><span class="token operator">:</span> <span class="token string">'Update todo.'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">operationId</span><span class="token operator">:</span> <span class="token string">'updateTodo'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">parameters</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token keyword">in</span><span class="token operator">:</span> <span class="token string">'query'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'id'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">required</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'string'</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span>
+        <span class="token keyword">in</span><span class="token operator">:</span> <span class="token string">'body'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'todo'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">schema</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token literal-property property">$ref</span><span class="token operator">:</span> <span class="token string">'#/definitions/Todo'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">responses</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token number">200</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token literal-property property">description</span><span class="token operator">:</span> <span class="token string">'Updated ok'</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+  <span class="token constant">DELETE</span><span class="token punctuation">.</span>apiDoc <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">summary</span><span class="token operator">:</span> <span class="token string">'Delete todo.'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">operationId</span><span class="token operator">:</span> <span class="token string">'deleteTodo'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">consumes</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'application/json'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">parameters</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token keyword">in</span><span class="token operator">:</span> <span class="token string">'query'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'id'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">required</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'string'</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">responses</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token number">200</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token literal-property property">description</span><span class="token operator">:</span> <span class="token string">'Delete'</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> operations<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<h4 id="5-add-autogenerated-documentation-swagger-ui-express" tabindex="-1">5. Add autogenerated documentation, <a href="https://github.com/scottie1984/swagger-ui-express">swagger-ui-express</a>: <a class="header-anchor" href="#5-add-autogenerated-documentation-swagger-ui-express">#</a></h4>
+<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">npm</span> i swagger-ui-express <span class="token parameter variable">-s</span></code></pre>
+<p><em><code>📁 app.js</code></em></p>
+<pre class="language-js" tabindex="0"><code class="language-js"><span class="token comment">// OpenAPI UI</span>
+app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span>
+	<span class="token string">"/api-documentation"</span><span class="token punctuation">,</span>
+	swaggerUi<span class="token punctuation">.</span>serve<span class="token punctuation">,</span>
+	swaggerUi<span class="token punctuation">.</span><span class="token function">setup</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+		<span class="token literal-property property">swaggerOptions</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+			<span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">"http://localhost:3030/api-docs"</span><span class="token punctuation">,</span>
+		<span class="token punctuation">}</span><span class="token punctuation">,</span>
+	<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> app<span class="token punctuation">;</span></code></pre>
+<p>The auto-generated SwaggerUi, is available at http://localhost:3030/api-documentation</p>
+<p><strong>🎉 Congratulations!</strong></p>
+<p>If you have made it this far, you should have a fully functioning Express application, fully integrated with OpenAPI.</p>
+<p>Using the schema available in <a href="http://localhost:3030/api-docs">http://localhost:3030/api-docs</a> we can now easily generate <a href="https://nordicapis.com/generating-web-api-tests-from-an-openapi-specification/">tests</a>, a <a href="https://github.com/stoplightio/prism">mock server</a>, <a href="https://github.com/drwpow/openapi-typescript">types</a> or even a <a href="https://phrase.com/blog/posts/using-openapi-to-generate-api-client-code/">client</a>!</p>
+<br>
+<h2 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h2>
+<p>We scratched only the surface of whats possible with OpenAPI. But I hope the article shed some light on how a standard API definition schema can help with visibility, testing, documentation, and overall confidence when building REST APIs.</p>
+<p>Thanks for sticking around until the end!</p>
+
+<ul class="links-nextprev"><li> Previous: <a href="/eleventy-base-blog/blog/2021-03-02_clean-apis-in-react-with-ts/">Clean APIs in React with TypeScript</a></li><li>Next: <a href="/eleventy-base-blog/blog/2021-07-14_advanced-electron-architecture/">Advanced Electron.js architecture</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/eleventy-base-blog/blog/2021-04-02_better-apis-with-openapi/` was built on 2024-09-19T20:58:45.908Z -->
+	</body>
+</html>

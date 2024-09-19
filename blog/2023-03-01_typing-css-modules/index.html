@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Typing CSS Modules</title>
+		<meta name="description" content="By leaning into automation 🤖">
+
+		<link rel="icon" type="image/png" sizes="196x196" href="/eleventy-base-blog/img/favicon-196.png">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Alain Perkaz">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Alain Perkaz">
+		
+		<style>/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
+}
+* { box-sizing: border-box; }
+/* Defaults */
+:root {
+	--font-family: -apple-system, system-ui, sans-serif;
+	--font-family-monospace: Consolas, Menlo, Monaco, Andale Mono WT, Andale Mono,
+		Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono,
+		Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Courier New,
+		Courier, monospace;
+}
+
+/* Theme colors */
+:root {
+	--color-gray-20: #e0e0e0;
+	--color-gray-50: #c0c0c0;
+	--color-gray-90: #333;
+
+	--background-color: #fff;
+
+	--text-color: var(--color-gray-90);
+	--text-color-link: #082840;
+	--text-color-link-active: #5f2b48;
+	--text-color-link-visited: #17050f;
+
+	--syntax-tab-size: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-gray-20: #e0e0e0;
+		--color-gray-50: #c0c0c0;
+		--color-gray-90: #dad8d8;
+
+		/* --text-color is assigned to --color-gray-_ above */
+		--text-color-link: #1493fb;
+		--text-color-link-active: #6969f7;
+		--text-color-link-visited: #a6a6f8;
+
+		--background-color: #15202b;
+	}
+}
+
+/* Global stylesheet */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0 auto;
+	font-family: var(--font-family);
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+html {
+	overflow-y: scroll;
+}
+body {
+	max-width: 40em;
+}
+
+/* prevents images from overflowing parent p in posts */
+p img {
+	width: 100%;
+	height: auto; /* Maintain aspect ratio */
+	max-width: 100%; /* Ensure the image doesn't stretch beyond its original size */
+	display: block; /* Remove inline element gap */
+}
+
+/* https://www.a11yproject.com/posts/how-to-hide-content/ */
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+p:last-child {
+	margin-bottom: 0;
+}
+p {
+	line-height: 1.5;
+}
+
+li {
+	line-height: 1.5;
+}
+
+a[href] {
+	color: var(--text-color-link);
+}
+a[href]:visited {
+	color: var(--text-color-link-visited);
+}
+a[href]:hover,
+a[href]:active {
+	color: var(--text-color-link-active);
+}
+
+main {
+	padding: 1rem;
+}
+main :first-child {
+	margin-top: 0;
+}
+
+header:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.links-nextprev {
+	list-style: none;
+	border-top: 1px dashed var(--color-gray-20);
+	padding: 1em 0;
+}
+
+table {
+	margin: 1em 0;
+}
+table td,
+table th {
+	padding-right: 1em;
+}
+
+pre,
+code {
+	/* TODONOW: add different font for code */
+	font-family: var(--font-family-monospace);
+	font-size: 0.9rem !important;
+}
+pre:not([class*="language-"]) {
+	margin: 0.5em 0;
+	line-height: 1.375; /* 22px /16 */
+	-moz-tab-size: var(--syntax-tab-size);
+	-o-tab-size: var(--syntax-tab-size);
+	tab-size: var(--syntax-tab-size);
+	-webkit-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+}
+code {
+	word-break: break-all;
+}
+
+/* Header */
+header {
+	display: flex;
+	gap: 1em 0.5em;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 1em;
+}
+.home-link {
+	font-size: 1em; /* 16px /16 */
+	/* font-weight: 700; */
+	margin-right: 3em;
+	text-decoration: none;
+
+	font-weight: bold;
+	background: linear-gradient(
+		90deg,
+		hsl(304, 100%, 27%) 0%,
+		hsl(319deg 100% 30%) 20%,
+		hsl(329deg 100% 36%) 33%,
+		hsl(336deg 100% 41%) 42%,
+		hsl(346deg 83% 51%) 50%,
+		hsl(3deg 95% 61%) 58%,
+		hsl(17deg 100% 59%) 67%,
+		hsl(30deg 100% 55%) 75%,
+		hsl(40deg 100% 50%) 100%
+	); /* Gradient colors */
+	-webkit-background-clip: text; /* Safari/Chrome */
+	-webkit-text-fill-color: transparent; /* Safari/Chrome */
+	background-clip: text; /* Standard for Firefox */
+	color: transparent; /* Standard text color for unsupported browsers */
+}
+.home-link:link:not(:hover) {
+	text-decoration: none;
+}
+
+/* Nav */
+.nav {
+	display: flex;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+.nav-item {
+	display: inline-block;
+	margin-right: 2em;
+}
+.nav-item a[href]:not(:hover) {
+	text-decoration: none;
+}
+.nav a[href][aria-current="page"] {
+	text-decoration: underline;
+}
+
+/* Posts list */
+.postlist {
+	list-style: none;
+	padding: 0;
+	padding-left: 1.5rem;
+}
+.postlist-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	counter-increment: start-from -1;
+	margin-bottom: 1em;
+}
+.postlist-item:before {
+	display: inline-block;
+	pointer-events: none;
+	content: "" counter(start-from, decimal-leading-zero) ". ";
+	line-height: 100%;
+	text-align: right;
+	margin-left: -1.5rem;
+}
+.postlist-date,
+.postlist-item:before {
+	font-size: 0.8125em; /* 13px /16 */
+	color: var(--color-gray-90);
+}
+.postlist-date {
+	word-spacing: -0.5px;
+}
+.postlist-link {
+	font-size: 1.1875em; /* 19px /16 */
+	font-weight: 700;
+	flex-basis: calc(100% - 1.5rem);
+	padding-left: 0.25em;
+	padding-right: 0.5em;
+	text-underline-position: from-font;
+	text-underline-offset: 0;
+	text-decoration-thickness: 1px;
+}
+.postlist-item-active .postlist-link {
+	font-weight: bold;
+}
+
+/* Tags */
+.post-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: capitalize;
+	font-style: italic;
+}
+.postlist-item > .post-tag {
+	align-self: center;
+}
+
+/* Tags list */
+.post-metadata {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.post-metadata time {
+	margin-right: 1em;
+}
+
+/* Direct Links / Markdown Headers */
+.header-anchor {
+	text-decoration: none;
+	font-style: normal;
+	font-size: 1em;
+	margin-left: 0.1em;
+}
+a[href].header-anchor,
+a[href].header-anchor:visited {
+	color: transparent;
+}
+a[href].header-anchor:focus,
+a[href].header-anchor:hover {
+	text-decoration: underline;
+}
+a[href].header-anchor:focus,
+:hover > a[href].header-anchor {
+	color: #aaa;
+}
+
+h2 + .header-anchor {
+	font-size: 1.5em;
+}</style>
+	</head>
+	<body>
+		<a href="#skip" class="visually-hidden">Skip to main content</a>
+
+		<header>
+			<a href="/eleventy-base-blog/" class="home-link">Alain Perkaz</a>
+			<nav>
+				<h2 class="visually-hidden">Top level navigation menu</h2>
+				<ul class="nav">
+					<li class="nav-item"><a href="/eleventy-base-blog/">Home</a></li>
+					<li class="nav-item"><a href="/eleventy-base-blog/blog/">Posts</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+<h1>Typing CSS Modules</h1>
+
+<ul class="post-metadata">
+	<li><time datetime="2023-03-01">01 March 2023</time></li>
+</ul>
+
+<p>One of the great things about working with TypeScript is that it significantly reduces and even removes the occurrence of specific bugs (typos, accessing prototype methods, and eases refactoring). Bugs caught at compile time make for more uptime, happier customers, and less on-call stress for developers.</p>
+<p>TypeScript makes it easy to type our applications business logic and control flows; what if we could make our CSS module classes safe too?</p>
+<p>This article will briefly discuss what CSS modules are, their developer experience shortcomings, and how to address them using TypeScript and automation.</p>
+<h2 id="what-are-css-modules" tabindex="-1">What are CSS Modules? <a class="header-anchor" href="#what-are-css-modules">#</a></h2>
+<p><a href="https://css-tricks.com/css-modules-part-1-need/">CSS Modules</a> are a way to write modular, scoped CSS specific to your application's particular component or module.</p>
+<p>At build time (with <a href="https://vitejs.dev/">Vite</a> or other tools), the CSS Modules generate unique class names for each class defined in the CSS files. The generated class names are then used in JavaScript to refer to the CSS.</p>
+<p>This makes the CSS modular and reusable, without class name conflicts or unnecessary duplications. It solves many of the pains that methodologies such as <a href="https://getbem.com/">BEM</a> were designed to solve, but without the manual effort (following BEM within CSS Modules can still bring benefits).</p>
+<p><em><code>📁 button.module.css</code></em></p>
+<pre class="language-css" tabindex="0"><code class="language-css"><span class="token selector">.green</span> <span class="token punctuation">{</span>
+	<span class="token property">background-color</span><span class="token punctuation">:</span> <span class="token string">"green"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token selector">.red</span> <span class="token punctuation">{</span>
+	<span class="token property">background-color</span><span class="token punctuation">:</span> <span class="token string">"red"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p><em><code>📁 Component.tsx</code></em></p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">import</span> styles <span class="token keyword">from</span> <span class="token string">"./button.module.css"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">Component</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+	<span class="token operator">&lt;</span><span class="token operator">></span>
+		<span class="token operator">&lt;</span>button className<span class="token operator">=</span><span class="token punctuation">{</span>styles<span class="token punctuation">.</span>green<span class="token punctuation">}</span><span class="token operator">></span><span class="token constant">I</span> am green<span class="token operator">!</span><span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+		<span class="token operator">&lt;</span>button className<span class="token operator">=</span><span class="token punctuation">{</span>styles<span class="token punctuation">.</span>red<span class="token punctuation">}</span><span class="token operator">></span><span class="token constant">I</span> am red<span class="token operator">!</span><span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+	<span class="token operator">&lt;</span><span class="token operator">/</span><span class="token operator">></span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<h2 id="developer-experience-improvements" tabindex="-1">Developer Experience improvements <a class="header-anchor" href="#developer-experience-improvements">#</a></h2>
+<p>CSS Modules are a great tool, but since the class names are generated at runtime (and change between builds), is hard to use them in a type-safe way.</p>
+<p>Manually typing each CSS Module is possible (using a TypeScript definition files), but updating them is tedious. Suppose a class name is added or removed from the CSS Module. In that case, the types must be manually updated, or the type safety won't work as expected! 😅</p>
+<p><em><code>📁 button.module.css</code></em></p>
+<pre class="language-css" tabindex="0"><code class="language-css"><span class="token selector">.green</span> <span class="token punctuation">{</span>
+	<span class="token property">background-color</span><span class="token punctuation">:</span> <span class="token string">"green"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token selector">.blue</span> <span class="token punctuation">{</span>
+	<span class="token comment">/* 👈 `red` classname is removed, and `blue` is added instead */</span>
+	<span class="token property">background-color</span><span class="token punctuation">:</span> <span class="token string">"blue"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p><em><code>📁 button.module.css.d.ts</code></em></p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">declare</span> <span class="token keyword">const</span> styles<span class="token operator">:</span> <span class="token punctuation">{</span>
+	<span class="token keyword">readonly</span> green<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+	<span class="token keyword">readonly</span> red<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span> <span class="token comment">// 👈 we forgot to update the types! 😔</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">export</span> <span class="token keyword">default</span> styles<span class="token punctuation">;</span></code></pre>
+<p><em><code>📁 Component.tsx</code></em></p>
+<pre class="language-typescript" tabindex="0"><code class="language-typescript"><span class="token keyword">import</span> styles <span class="token keyword">from</span> <span class="token string">"./button.module.css"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">Component</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">(</span>
+	<span class="token operator">&lt;</span><span class="token operator">></span>
+		<span class="token operator">&lt;</span>button className<span class="token operator">=</span><span class="token punctuation">{</span>styles<span class="token punctuation">.</span>green<span class="token punctuation">}</span><span class="token operator">></span><span class="token constant">I</span> am green<span class="token operator">!</span><span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+		<span class="token punctuation">{</span><span class="token comment">/* 👇 `red` does not exist, but since we forgot to update the types, the compiler wont fail! */</span><span class="token punctuation">}</span>
+		<span class="token operator">&lt;</span>button className<span class="token operator">=</span><span class="token punctuation">{</span>styles<span class="token punctuation">.</span>red<span class="token punctuation">}</span><span class="token operator">></span>Am <span class="token constant">I</span> blue<span class="token operator">?</span><span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+	<span class="token operator">&lt;</span><span class="token operator">/</span><span class="token operator">></span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>This may be trivial on small projects, but as the codebase and number of contributors grow, this repetitive and error-prone process will hinder the trust in the type-system. Let's see how we can automate it!</p>
+<h2 id="automatic-typings" tabindex="-1">Automatic typings <a class="header-anchor" href="#automatic-typings">#</a></h2>
+<p>In this case, the automation solution is straight forward: we will generate the types automatically (instead of manually), and provide a script to verify that the generated types are up-to-date (to avoid incorrect types leaking into the compilation).</p>
+<p>We could build a CSS to TypeScript definition extractor. Still, in this case we will leverage the open source package <a href="https://github.com/Quramy/typed-css-modules"><code>typed-css-modules</code></a> (don't reinvent the wheel)!</p>
+<ol>
+<li>Install the package into your project: <code>npm i typed-css-modules</code></li>
+<li>Add type-generation to your main development script (in the example, <code>watch</code>).</li>
+<li>Add a script to check for up-to-date types, it will fail if the generated types are not correct (<code>check:up-to-date-types</code>).</li>
+</ol>
+<p><em><code>📁 package.json</code></em></p>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+  <span class="token property">"watch"</span><span class="token operator">:</span> <span class="token string">"vite build --watch &amp; tcm --watch ."</span><span class="token punctuation">,</span>
+  <span class="token property">"check:up-to-date-types"</span><span class="token operator">:</span> <span class="token string">"tcm --listDifferent ."</span>
+<span class="token punctuation">}</span></code></pre>
+<p>With those two scripts, its now possible to automatically keep the CSS Module type definitions in sync and check in the CI if the types are kept up to date.</p>
+<h2 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h2>
+<p>Working within the TypeScript ecosystem provides great potential, but it's easy to blow the trust in the type-system or generate unnecessary friction when leaning too much on manual processes.</p>
+<p>Automate the boring stuff so that your team can focus on building a great products instead!</p>
+
+<ul class="links-nextprev"><li> Previous: <a href="/eleventy-base-blog/blog/2022-09-12_dependency-boundaries/">Dependency boundaries in TypeScript</a></li><li>Next: <a href="/eleventy-base-blog/blog/2024-05-01_typing-dynamic-apis/">Typing dynamic API responses</a></li>
+</ul>
+
+		</main>
+
+		<footer></footer>
+
+		<!-- This page `/eleventy-base-blog/blog/2023-03-01_typing-css-modules/` was built on 2024-09-19T20:58:45.911Z -->
+	</body>
+</html>
