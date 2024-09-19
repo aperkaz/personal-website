@@ -1,9 +1,9 @@
 ---
-title: 'Node.js with PM2'
-publishedAt: '2021-10-07'
-summary: 'Best practices for Node.js process management with PM2.'
-banner: '/images/blog/2021-10-07_node-with-PM2/banner.png'
-externalUrl: 'https://blog.logrocket.com/best-practices-nodejs-process-management-pm2/'
+title: "Node.js with PM2"
+date: "2021-10-07"
+description: "Best practices for Node.js process management with PM2."
+banner: "/images/blog/2021-10-07_node-with-PM2/banner.png"
+externalUrl: "https://blog.logrocket.com/best-practices-nodejs-process-management-pm2/"
 ---
 
 Writing the perfect app is only half of the job of a developer. How you design your app’s deployment strategy and monitor it throughout its lifecycle can determine the success or failure of your project, regardless of whether you’re using Heroku, Docker, or Kubernetes to manage your infrastructure.
@@ -91,9 +91,7 @@ Once the app is running with PM2,add the following code in the terminal:
 pm2 monit
 ```
 
-<div style={{ position: 'relative', width: '100%', height: '500px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-10-07_node-with-PM2/image1.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image1.png", "Image" %}
 
 # Conclusion
 

@@ -1,9 +1,9 @@
 ---
-title: 'Better Express APIs with OpenAPI'
-publishedAt: '2021-04-02'
-summary: 'How to Build Better APIs in Express with OpenAPI.'
-banner: '/images/blog/2021-04-02_better-apis-with-openapi/banner.png'
-externalUrl: 'https://www.freecodecamp.org/news/how-to-build-explicit-apis-with-openapi/'
+title: "Better Express APIs with OpenAPI"
+description: "How to Build Better APIs in Express with OpenAPI."
+date: 2021-04-02
+banner: "/images/blog/2021-04-02_better-apis-with-openapi/banner.png"
+externalUrl: "https://www.freecodecamp.org/news/how-to-build-explicit-apis-with-openapi/"
 ---
 
 In this article, I will share how to build robust REST APIs in Express. First, I will present some of the challenges of building REST APIs and then propose a solution using open standards.
@@ -16,7 +16,9 @@ There is great value in sharing the same programming language between an applica
 
 That said, as MVPs grow into full-blown production applications and development teams scale, this flexibility creates challenges too.
 
-# Challenges of Working with REST APIs
+<br />
+
+## Challenges of Working with REST APIs
 
 There are many challenges to face when codebases and teams grow, regardless of which tech stack you use.
 
@@ -24,7 +26,7 @@ I'll narrow these challenges down to Express.js apps which contain business logi
 
 Regardless of the nature of the API consumers (webpages, mobile apps, third-party backends), they are likely to face one (or more) of the following challenges as they grow:
 
-## 1. ⚠️ It's harder to make changes
+### 1. ☠️ It's harder to make changes
 
 When the contract is not explicit, making changes on either side of the REST API becomes harder.
 
@@ -32,7 +34,7 @@ For example, you may have a REST endpoint that returns a specific user's name. I
 
 You can set up integration tests to mitigate this issue, but you will still heavily rely on the developers to manually cover all the edge cases. This takes lots of time and effort, and you are never 100% certain that the changes won't break the app.
 
-## 2. 📜 Lack of (updated) documentation
+### 2. 📜 Lack of (updated) documentation
 
 Documentation is another sensitive topic when building REST APIs. I am a firm believer that, in most cases, the code should serve as enough documentation.
 
@@ -40,7 +42,7 @@ That said, REST APIs can grow in complexity, and checking the security, paramete
 
 Even if the team is committed to manually keeping the documentation up to date in a separate document from the code, it's hard to be 100% certain that it reflects the code.
 
-## 3. 📢 Public APIs
+### 3. 📢 Public APIs
 
 This won't apply to all apps, but an application may need to expose a set of functionalities to a third party in some cases. When doing so, the third party may build core functionalities on top of our exposed APIs.
 
@@ -48,7 +50,7 @@ This means that we can't modify those APIs at the same rate that we update our p
 
 What the public APIs expose should be explicit and simple to develop against, to limit the amount of back and forth communication needed between internal and external developer teams.
 
-## 4. ✍️ Manual integration tests
+### 4. ✍️ Manual integration tests
 
 When applications grow organically without a thorough plan, the chances are high that what the API provides and what the API consumer expects is buried deep into the code.
 
@@ -56,11 +58,13 @@ This is not a big problem when you have a small number of endpoints for internal
 
 This can be mitigated by keeping integration tests between the parts of the system that talk to the REST API. But doing it manually is tremendous work and when done poorly, provides false security that the system will work properly.
 
-# Proposed solution
+<br/>
+
+## Proposed solution
 
 We have seen some of the inherent challenges that come with building REST APIs. In the following section we will build an example Express project that addresses those challenges using open standards.
 
-## API standard specification
+### API standard specification
 
 The challenges described in the previous section have been around for a long time, so it pays off to look into existing solutions, instead of re-inventing the wheel.
 
@@ -70,7 +74,7 @@ Having some sort of formal specification of the API solves many of the challenge
 
 One of my favorites is OpenAPI (formerly Swagger). It has a big community, and plenty of tooling for Express. This may not the be the best tool for every REST API project out there, so remember to do some extra research to make sure the tooling and support around the said specification makes sense in your case.
 
-## Context for our example
+### Context for our example
 
 For the sake of this example, let's suppose we are building a todo list management app. The user has access to a web app where they can fetch, create, edit and delete todos, which are persisted in the backend.
 
@@ -83,7 +87,7 @@ In this case, the backend will be an Express.js app that will expose over a REST
 
 This is an over-simplification of the functionalities that a todo management app will need, but will serve to show how we can overcome the challenges presented above in a real context.
 
-## Implementation
+### Implementation
 
 Great, now that we have introduced open standards for API definitions and a context, let's implement an Express todos app tackling the previous challenges.
 
@@ -91,7 +95,7 @@ We will be using an OpenAPI with the Express library [**express-openapi**](https
 
 The complete code is available in [**this repository**](https://github.com/aperkaz/express-open-api).
 
-### 1. Initialize a Express skeleton and initialize a Git repo:
+#### 1. Initialize a Express skeleton and initialize a Git repo:
 
 ```bash
 npx express-generator --no-view --git todo-app
@@ -100,62 +104,68 @@ git init
 git add .; git commit -m "Initial commit";
 ```
 
-### 2. Add the OpenAPI Express library, [**express-openapi**](https://github.com/kogosoftwarellc/open-api/tree/master/packages/express-openapi):
+#### 2. Add the OpenAPI Express library, [**express-openapi**](https://github.com/kogosoftwarellc/open-api/tree/master/packages/express-openapi):
 
 ```bash
 npm i express-openapi -s
 ```
 
-```js:app.js
+_`📁 app.js`_
+
+```js
 app.listen(3030);
 
 // OpenAPI routes
 initialize({
-  app,
-  apiDoc: require('./api/api-doc'),
-  paths: './api/paths',
+	app,
+	apiDoc: require("./api/api-doc"),
+	paths: "./api/paths",
 });
 
 module.exports = app;
 ```
 
-### 3. Add OpenAPI base schema.
+#### 3. Add OpenAPI base schema.
 
 Note that the schema defines the type of a **Todo**, which will be referenced in the route handlers.
 
-```js:api/api-doc.js
+_`📁 api/api-doc.js`_
+
+```js
 const apiDoc = {
-  swagger: '2.0',
-  basePath: '/',
-  info: {
-    title: 'Todo app API.',
-    version: '1.0.0',
-  },
-  definitions: {
-    Todo: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'number',
-        },
-        message: {
-          type: 'string',
-        },
-      },
-      required: ['id', 'message'],
-    },
-  },
-  paths: {},
+	swagger: "2.0",
+	basePath: "/",
+	info: {
+		title: "Todo app API.",
+		version: "1.0.0",
+	},
+	definitions: {
+		Todo: {
+			type: "object",
+			properties: {
+				id: {
+					type: "number",
+				},
+				message: {
+					type: "string",
+				},
+			},
+			required: ["id", "message"],
+		},
+	},
+	paths: {},
 };
 
 module.exports = apiDoc;
 ```
 
-### 4. Add route [handlers](https://github.com/kogosoftwarellc/open-api/tree/master/packages/express-openapi#getting-started).
+#### 4. Add route [handlers](https://github.com/kogosoftwarellc/open-api/tree/master/packages/express-openapi#getting-started):
 
 Each handler declares which operations it supports (GET, POST...), the callbacks for each operation, and the apiDoc OpenAPI schema for that handler.
 
-```js:api/paths/todos/index.js
+_`📁 api/paths/todos/index.js`_
+
+```js
 module.exports = function () {
   let operations = {
     GET,
@@ -270,22 +280,24 @@ module.exports = function () {
 };
 ```
 
-### 5. Add autogenerated documentation, [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express):
+#### 5. Add autogenerated documentation, [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express):
 
 ```bash
 npm i swagger-ui-express -s
 ```
 
-```js:app.js
+_`📁 app.js`_
+
+```js
 // OpenAPI UI
 app.use(
-  '/api-documentation',
-  swaggerUi.serve,
-  swaggerUi.setup(null, {
-    swaggerOptions: {
-      url: 'http://localhost:3030/api-docs',
-    },
-  }),
+	"/api-documentation",
+	swaggerUi.serve,
+	swaggerUi.setup(null, {
+		swaggerOptions: {
+			url: "http://localhost:3030/api-docs",
+		},
+	})
 );
 
 module.exports = app;
@@ -299,7 +311,9 @@ If you have made it this far, you should have a fully functioning Express applic
 
 Using the schema available in [http://localhost:3030/api-docs](http://localhost:3030/api-docs) we can now easily generate [tests](https://nordicapis.com/generating-web-api-tests-from-an-openapi-specification/), a [mock server](https://github.com/stoplightio/prism), [types](https://github.com/drwpow/openapi-typescript) or even a [client](https://phrase.com/blog/posts/using-openapi-to-generate-api-client-code/)!
 
-# Conclusion
+<br/>
+
+## Conclusion
 
 We scratched only the surface of whats possible with OpenAPI. But I hope the article shed some light on how a standard API definition schema can help with visibility, testing, documentation, and overall confidence when building REST APIs.
 

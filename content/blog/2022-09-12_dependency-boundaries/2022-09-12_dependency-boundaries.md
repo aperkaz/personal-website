@@ -1,9 +1,9 @@
 ---
-title: 'Dependency boundaries in TypeScript'
-publishedAt: '2022-09-12'
-summary: 'How to keep dependencies under control.'
-banner: '/images/blog/2022-09-12_dependency-boundaries/banner.png'
-externalUrl: 'https://blog.logrocket.com/managing-dependency-boundaries-typescript/'
+title: "Dependency boundaries in TypeScript"
+date: "2022-09-12"
+description: "How to keep dependencies under control."
+banner: "/images/blog/2022-09-12_dependency-boundaries/banner.png"
+externalUrl: "https://blog.logrocket.com/managing-dependency-boundaries-typescript/"
 ---
 
 Code projects of reasonable size tend to follow certain principles for abstracting complexity (aka architecture), making them easier to reason about and evolve. There are endless ways of doing so, some common examples being the [Model View Controller](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC) and [Hexagonal architecture](<https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>).
@@ -22,15 +22,15 @@ In TypeScript, variables (functions, objects, values) can be imported/exported b
 
 ```typescript
 // constants.ts
-export const USER = 'Alain';
+export const USER = "Alain";
 
 // logic.ts
-import { USER } from './constants';
+import { USER } from "./constants";
 
 export const greet = (): string => `Hi ${USER}!`;
 
 // ui.ts
-import { greet } from './logic';
+import { greet } from "./logic";
 
 const html = `<h1>${greet()}</h1>`; // <h1>Hi Alain!</h1>
 ```
@@ -39,9 +39,7 @@ This enables breaking up the functionality into modules, which can be organized 
 
 This module syntax allows for great flexibility, imposing no restrictions on what can be exported or imported from anywhere. The dependency graphs are implicitly defined across the app.
 
-<div style={{ position: 'relative', width: '100%', height: '400px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2022-09-12_dependency-boundaries/image1.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image1.png", "Image" %}
 
 As a project develops, that implicit dependency graph can grow unchecked, leading to some pitfalls.
 
@@ -77,9 +75,7 @@ The UI does not have access to the business-logic methods in the app, as they ar
 
 The dependency graph between modules is as follows. Note that the dependency between modules is marked with an arrow, the internal modules are colored grey, and the external packages are blue.
 
-<div style={{ position: 'relative', width: '100%', height: '400px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2022-09-12_dependency-boundaries/image2.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image2.png", "Image" %}
 
 To implement the schema above, we will create three different fenced directories: `math`, `store`, and `ui`. Each directory maps to one of the modules in the schema.
 
@@ -120,9 +116,9 @@ For an in-depth explanation of the fence configuration options, you can check th
 
 All those rules can be checked programmatically by running the `good-fences` npm package, pointing towards the `tsconfig.json` file of the project (`yarn good-fences` on the project).
 
-You can now run the checks as part of your CI/CD pipelines or as a commit hooks! 🎉
+You can now run the checks as part of your CI/CD pipelines or as commit hooks! 🎉
 
-## Conclussion
+## Conclusion
 
 Thanks for sticking until the end!
 
@@ -132,4 +128,4 @@ Proper dependency management and following the architectural design during imple
 
 The code is available in the [following repo](https://github.com/aperkaz/code-boundaries); feel free to change and explore it further.
 
-Happy coding! 🎉
+Happy coding! 🚀

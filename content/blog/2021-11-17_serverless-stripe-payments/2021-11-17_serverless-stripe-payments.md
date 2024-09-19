@@ -1,9 +1,9 @@
 ---
-title: 'Serverless payments with Netlify and Stripe'
-publishedAt: '2021-11-17'
-summary: 'How to set up serverless online payments with Netlify and Stripe.'
-banner: '/images/blog/2021-11-17_serverless-stripe-payments/banner.png'
-externalUrl: 'https://www.freecodecamp.org/news/serverless-online-payments/'
+title: "Serverless payments with Netlify and Stripe"
+date: "2021-11-17"
+description: "How to set up serverless online payments with Netlify and Stripe."
+banner: "/images/blog/2021-11-17_serverless-stripe-payments/banner.png"
+externalUrl: "https://www.freecodecamp.org/news/serverless-online-payments/"
 ---
 
 One of the first steps many young startups take is setting up a static web page, perhaps with an email newsletter, to help them build an audience.
@@ -44,9 +44,7 @@ Since our startup already has a web page, we'll use [Netlify functions](https://
 
 The paradigm of combining static web assets with on-demand serverless functions is part of the [JAM Stack](https://jamstack.org/) (we'll leave that for another post). Keep reading for the detailed instruction on how to set up serverless payments.
 
-<div style={{ position: 'relative', width: '100%', height: '400px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-11-17_serverless-stripe-payments/image1.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image1.png", "Image" %}
 
 # Step-by-step project setup
 
@@ -62,17 +60,13 @@ Netlify provides CI/CD for automated deployments of our webpage and serverless f
 
 Next, install the [Netlify CLI](https://cli.netlify.com/getting-started/). It will ask you some questions and request access to your Netlify and Git repo provider (GitHub in my case).
 
-<div style={{ position: 'relative', width: '100%', height: '500px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-11-17_serverless-stripe-payments/image2.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image2.png", "Image" %}
 
 👆 output of installing the CLI with `npm install netlify-cli -g`.
 
 At this point, we can push to the repository’s `main` / `master` branch, and Netlify will automatically deploy. You can run `netlify open` in the console to open Netlify’s admin panel, and visit the deployed URL.
 
-<div style={{ position: 'relative', width: '100%', height: '500px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-11-17_serverless-stripe-payments/image3.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image3.png", "Image" %}
 
 Excellent, with the auto-deploy ready, now let's set up Stripe. 💸
 
@@ -98,7 +92,7 @@ Hang on tight – we are almost there! We only need the server-side code to crea
 
 First, to make our function accessible from https://serverless-payments.netlify.app/api/stripe, we need to add some configurations. Let's start by creating the `netlify.toml` file, on the root of our repo.
 
-```toml:netlify.toml
+```yaml
 [build]
 command = "# no build command"
 functions = "netlify/functions"
@@ -112,34 +106,36 @@ status = 200
 
 Then, we can add the session creator function. It’s explained here.
 
-```javascript:netlify/function/stripe.js
-const stripe = require('stripe')(process.env.STRIPE_SECRET);
+_`📁 netlify/function/stripe.js`_
+
+```javascript
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 exports.handler = async (event, context) => {
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: 'T-shirt',
-          },
-          unit_amount: 2000,
-        },
-        quantity: 1,
-      },
-    ],
-    mode: 'payment',
-    success_url: 'https://serverless-payments.netlify.app/success',
-    cancel_url: 'https://serverless-payments.netlify.app/cancel',
-  });
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      id: session.id,
-    }),
-  };
+	const session = await stripe.checkout.sessions.create({
+		payment_method_types: ["card"],
+		line_items: [
+			{
+				price_data: {
+					currency: "usd",
+					product_data: {
+						name: "T-shirt",
+					},
+					unit_amount: 2000,
+				},
+				quantity: 1,
+			},
+		],
+		mode: "payment",
+		success_url: "https://serverless-payments.netlify.app/success",
+		cancel_url: "https://serverless-payments.netlify.app/cancel",
+	});
+	return {
+		statusCode: 200,
+		body: JSON.stringify({
+			id: session.id,
+		}),
+	};
 };
 ```
 
@@ -149,9 +145,7 @@ For the sake of brevity, I skipped the remaining code in the HTML files that han
 
 The complete example is available at https://serverless-payments.netlify.app . You can test a successful payment flow by using `4242 4242 4242 4242` as a credit card number.
 
-<div style={{ position: 'relative', width: '100%', height: '500px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-11-17_serverless-stripe-payments/image4.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image4.png", "Image" %}
 
 👆 Stripe Checkout in all its glory, accessible from our page.
 

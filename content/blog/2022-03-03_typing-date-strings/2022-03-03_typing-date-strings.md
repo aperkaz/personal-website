@@ -1,7 +1,7 @@
 ---
 title: 'Date-strings in TypeScript'
-publishedAt: '2022-03-03'
-summary: 'How to handle date-strings safely in TypeScript.'
+date: '2022-03-03'
+description: 'How to handle date-strings safely in TypeScript.'
 banner: '/images/blog/2022-03-03_typing-date-strings/banner.png'
 externalUrl: 'https://blog.logrocket.com/handing-date-strings-typescript/'
 ---

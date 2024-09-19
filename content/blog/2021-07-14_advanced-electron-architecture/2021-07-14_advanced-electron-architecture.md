@@ -1,14 +1,12 @@
 ---
-title: 'Advanced Electron.js architecture'
-publishedAt: '2021-07-14'
-summary: An exploration of different Electron architectures.
-banner: '/images/blog/2021-07-14_advanced-electron-architecture/banner.png'
-externalUrl: 'https://blog.logrocket.com/advanced-electron-js-architecture/'
+title: "Advanced Electron.js architecture"
+description: An exploration of different Electron architectures.
+date: 2021-07-14
+banner: "/images/blog/2021-07-14_advanced-electron-architecture/banner.png"
+externalUrl: "https://blog.logrocket.com/advanced-electron-js-architecture/"
 ---
 
-A while back, I began working on a side project called [taggr](https://taggr.ai/), a completely offline, interactive photo exploration app. Developing taggr required me to navigate up from the lowest level of app complexity, trying out multiple architectural approaches and exploring the limitations of each.
-
----
+> A while back, I began working on a side project called [taggr](https://taggr.ai/), a completely offline, interactive photo exploration app. Developing taggr required me to navigate up from the lowest level of app complexity, trying out multiple architectural approaches and exploring the limitations of each.
 
 In this article, we’ll discuss the trade-offs of different architectural approaches for building desktop applications with [Electron](https://blog.logrocket.com/building-cross-platform-desktop-apps-with-svelte-electron-and-reloadly/). We’ll analyze the shortcomings of each and introduce an architecture that aims to tackle them.
 
@@ -30,9 +28,7 @@ Each application’s window is a render process, which isolates the code executi
 
 Each app is composed of one main process and a variable number of render processes. Render processes can be used for JavaScript code execution and can be hidden without a UI.
 
-<div style={{ position: 'relative', width: '100%', height: '500px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-07-14_advanced-electron-architecture/image1.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image1.png", "Image 1" %}
 
 _Note: Electron is not the only option for building cross-platform desktop applications. Other [alternatives](https://github.com/sudhakar3697/electron-alternatives) offer less resource consumption and lighter executables, but none share the community, learning resources, or the widespread adoption of Electron._
 
@@ -72,9 +68,7 @@ Many businesses provide desktop versions of their successful web-based apps, mak
 
 As an example architecture, we’ll use a desktop app for the [Telegram chat](https://web.telegram.org/) web app. Electron will act as a wrapper for the existing web app without requiring any changes to the backend.
 
-<div style={{ position: 'relative', width: '100%', height: '500px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-07-14_advanced-electron-architecture/image2.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image2.png", "Image" %}
 
 Setting up Electron is easy for this type of app! There are no changes needed at the web app codebase level.
 
@@ -96,9 +90,7 @@ Similar to low-complexity apps, a medium-complexity app may also complement a we
 
 Let’s imagine that our streaming app plays a song of the day. If there is no internet connection, it will serve the available cached song.
 
-<div style={{ position: 'relative', width: '100%', height: '500px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-07-14_advanced-electron-architecture/image3.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image3.png", "Image" %}
 
 As outlined in the schema above, the UI will be served from local assets instead of a CDN, and the request layer has to be customized to support caching. While the example is relatively simple, the code-sharing and caching requirements will eventually increase in complexity, requiring custom Electron code.
 
@@ -121,9 +113,7 @@ Offline apps are significantly different from the previous two examples. Specifi
 
 For the architecture proposal, let’s consider the offline image processing app described above.
 
-<div style={{ position: 'relative', width: '100%', height: '500px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-07-14_advanced-electron-architecture/image4.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image4.png", "Image" %}
 
 The schema structures the app following the Electron documentation, which brings some limitations. For one, there is noticeable performance degradation when running the long-lived, CPU-intensive operations in a hidden renderer process.
 
@@ -137,9 +127,7 @@ If your app falls in the low or medium-complexity categories, congrats! Many of 
 
 When we consider issues in offline apps like performance degradation, roundtrip communication between render processes, and the overall developer experience, we need a specialized architecture:
 
-<div style={{ position: 'relative', width: '100%', height: '500px', marginBottom: '1.5rem' }}>
-  <Image src="/images/blog/2021-07-14_advanced-electron-architecture/image5.png" layout="fill" objectFit="contain" />
-</div>
+{% image "./image5.png", "Image" %}
 
 The proposed architecture is built on the following pillars:
 

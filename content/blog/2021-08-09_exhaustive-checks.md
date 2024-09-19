@@ -1,9 +1,9 @@
 ---
-title: 'Improving error handling in TypeScript'
-publishedAt: '2021-08-09'
-summary: 'Using exhaustive type checking for a better error controll in TS.'
-banner: '/images/blog/2021-08-09_exhaustive-checks/banner.png'
-externalUrl: 'https://blog.logrocket.com/improve-error-handling-typescript-exhaustive-type-checking/'
+title: "Improving error handling in TypeScript"
+description: "Using exhaustive type checking for a better error controll in TS."
+date: 2021-08-09
+banner: "/images/blog/2021-08-09_exhaustive-checks/banner.png"
+externalUrl: "https://blog.logrocket.com/improve-error-handling-typescript-exhaustive-type-checking/"
 ---
 
 There are very few programs that work in complete isolation. Even if developers always write perfect code, there is a high likelihood of encountering errors when code interacts with external components like databases, REST APIs, and even that trendy npm package that has a bunch of stars!
@@ -27,22 +27,24 @@ Returning null forces null checks everywhere in your code, causing specific info
 In the code block below, we’ll write a function that retrieves data about the temperature and humidity of a given city. The `getWeather` function interacts with two external APIs through two functions, `externalTemperatureAPI` and `externalHumidityAPI`, and aggregates the results:
 
 ```typescript
-const getWeather = async (city: string): Promise<{ temp: number; humidity: number } | null> => {
-  const temp = await externalTemperatureAPI(city);
-  if (!temp) {
-    console.log(`Error fetching temperature for ${city}`);
-    return null;
-  }
-  const humidity = await externalHumidityAPI(city);
-  if (!humidity) {
-    console.log(`Error fetching humidity for ${city}`);
-    return null;
-  }
-  return { temp, humidity };
+const getWeather = async (
+	city: string
+): Promise<{ temp: number; humidity: number } | null> => {
+	const temp = await externalTemperatureAPI(city);
+	if (!temp) {
+		console.log(`Error fetching temperature for ${city}`);
+		return null;
+	}
+	const humidity = await externalHumidityAPI(city);
+	if (!humidity) {
+		console.log(`Error fetching humidity for ${city}`);
+		return null;
+	}
+	return { temp, humidity };
 };
 
-const weather = await getWeather('Berlin');
-if (weather === null) console.log('getWeather() failed');
+const weather = await getWeather("Berlin");
+if (weather === null) console.log("getWeather() failed");
 ```
 
 We can see that on entering `Berlin`, we receive the error messages `Error fetching temperature for ${city}` and `Error fetching humidity for ${city}`.
@@ -60,26 +62,28 @@ However, any function that throws an error will be stopped and propagated up, di
 Let’s try to solve the error in our weather example with the `try...catch` method:
 
 ```typescript
-const getWeather = async (city: string): Promise<{ temp: number; humidity: number }> => {
-  try {
-    const temp = await externalTemperatureAPI(city);
-    try {
-      const humidity = await externalHumidityAPI(city);
-    } catch (error) {
-      console.log(`Error fetching humidity for ${city}`);
-      return new Error(`Error fetching humidity for ${city}`);
-    }
-    return { temp, humidity };
-  } catch (error) {
-    console.log(`Error fetching temperature for ${city}`);
-    return new Error(`Error fetching temperature for ${city}`);
-  }
+const getWeather = async (
+	city: string
+): Promise<{ temp: number; humidity: number }> => {
+	try {
+		const temp = await externalTemperatureAPI(city);
+		try {
+			const humidity = await externalHumidityAPI(city);
+		} catch (error) {
+			console.log(`Error fetching humidity for ${city}`);
+			return new Error(`Error fetching humidity for ${city}`);
+		}
+		return { temp, humidity };
+	} catch (error) {
+		console.log(`Error fetching temperature for ${city}`);
+		return new Error(`Error fetching temperature for ${city}`);
+	}
 };
 
 try {
-  const weather = await getWeather('Berlin');
+	const weather = await getWeather("Berlin");
 } catch (error) {
-  console.log('getWeather() failed');
+	console.log("getWeather() failed");
 }
 ```
 
@@ -98,21 +102,23 @@ Let’s look back at our weather example. We’ll use a TypeScript implementatio
 _There are other packages for TypeScript with very similar APIs, like [NeverThrow](https://github.com/supermacro/neverthrow), so feel free to play around._
 
 ```typescript
-import { Ok, Err, Result } from 'ts-results';
+import { Ok, Err, Result } from "ts-results";
 
-type Errors = 'CANT_FETCH_TEMPERATURE' | 'CANT_FETCH_HUMIDITY';
+type Errors = "CANT_FETCH_TEMPERATURE" | "CANT_FETCH_HUMIDITY";
 
-const getWeather = async (city: string): Promise<Result<{ temp: number; humidity: number }, Errors>> => {
-  const temp = await externalTemperatureAPI(city);
-  if (!temp) return Err('CANT_FETCH_TEMPERATURE');
+const getWeather = async (
+	city: string
+): Promise<Result<{ temp: number; humidity: number }, Errors>> => {
+	const temp = await externalTemperatureAPI(city);
+	if (!temp) return Err("CANT_FETCH_TEMPERATURE");
 
-  const humidity = await externalHumidityAPI(city);
-  if (!humidity) return Err('CANT_FETCH_HUMIDITY');
+	const humidity = await externalHumidityAPI(city);
+	if (!humidity) return Err("CANT_FETCH_HUMIDITY");
 
-  return Ok({ temp, humidity });
+	return Ok({ temp, humidity });
 };
 
-const weatherResult = await getWeather('Berlin'); // `weatherResult` is fully typed
+const weatherResult = await getWeather("Berlin"); // `weatherResult` is fully typed
 
 if (weatherResult.err) console.log(`getWeather() failed: ${weatherResult.val}`);
 if (weatherResult.ok) console.log(`Weather is: ${JSON.stringify(weather.val)}`);
@@ -133,28 +139,28 @@ We can achieve this with an exhaustive switch:
 ```typescript
 // Exhaustive switch helper
 class UnreachableCaseError extends Error {
-  constructor(val: never) {
-    super(`Unreachable case: ${val}`);
-  }
+	constructor(val: never) {
+		super(`Unreachable case: ${val}`);
+	}
 }
 
 // ...
 
-const weatherResult = getWeather('Berlin');
+const weatherResult = getWeather("Berlin");
 if (weatherResult.err) {
-  // handle errors
-  const errValue = weatherResult.val;
-  switch (errValue) {
-    case 'CANT_FETCH_TEMPERATURE':
-      console.error('getWeather() failed with: CANT_FETCH_TEMPERATURE');
-      break;
-    case 'CANT_FETCH_HUMIDITY':
-      console.error('getWeather() failed with: CANT_FETCH_HUMIDITY');
-      break;
-    default:
-      // 👇 runtime type check for catching all errors
-      throw new UnreachableCaseError(errValue);
-  }
+	// handle errors
+	const errValue = weatherResult.val;
+	switch (errValue) {
+		case "CANT_FETCH_TEMPERATURE":
+			console.error("getWeather() failed with: CANT_FETCH_TEMPERATURE");
+			break;
+		case "CANT_FETCH_HUMIDITY":
+			console.error("getWeather() failed with: CANT_FETCH_HUMIDITY");
+			break;
+		default:
+			// 👇 runtime type check for catching all errors
+			throw new UnreachableCaseError(errValue);
+	}
 }
 ```
 

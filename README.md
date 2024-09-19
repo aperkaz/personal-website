@@ -1,20 +1,8 @@
 # personal website - 11ty v8
 
+TODONOW: add css for horizontal scroll on opst code
+
 Docs on 11ty: https://www.11ty.dev/
-
-## Running the app
-
-Generate a production-ready build to the `_site` folder:
-
-```
-npx @11ty/eleventy
-```
-
-Or build and host on a local development server:
-
-```
-npx @11ty/eleventy --serve
-```
 
 ## Deploy this to your own site
 

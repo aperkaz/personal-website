@@ -1,22 +1,20 @@
 ---
-title: 'Clean APIs in React with TypeScript'
-publishedAt: '2021-03-02'
-summary: Designing cleaner type APIs for React components.
-banner: '/images/blog/2021-03-02_clean-apis-in-react-with-ts/banner.png'
-externalUrl: 'https://javascript.plainenglish.io/a-cleaner-api-for-react-ts-components-47d0704a508c'
+title: Clean APIs in React with TypeScript
+description: Designing cleaner type APIs for React components.
+date: 2021-03-02
 ---
 
 I hope this article shares some light on how to build better React components leveraging TypeScript. This post is an outcome of the efforts of building [taggr](https://taggr.ai/), the privacy-focused AI gallery.
 
 ---
 
-While building [taggr](https://taggr.ai/), I got deeper into TypeScript, and so far I am loving the added capabilities for annotating types and catching errors at compile time, instead off at runtime.
+> While building [taggr](https://taggr.ai/), I got deeper into TypeScript, and so far I am loving the added capabilities for annotating types and catching errors at compile time, instead off at runtime.
 
-It can feel daunting and extra work to annotate each component and function at first, but as the codebase grows in size and complexity, the benefits start to shine.
+> It can feel daunting and extra work to annotate each component and function at first, but as the codebase grows in size and complexity, the benefits start to shine.
 
-Having the components and business-logic code properly typed, keeps a unique source of truth for the entities of a domain, minimizing the human errors across the application layers.
+> Having the components and business-logic code properly typed, keeps a unique source of truth for the entities of a domain, minimizing the human errors across the application layers.
 
-Plus, TypeScript definitions can be automatically generated from [OpenAPI](https://github.com/drwpow/openapi-typescript), [GraphQL schemas](https://graphql-code-generator.com/docs/plugins/typescript)… A total win-win 🎉
+> Plus, TypeScript definitions can be automatically generated from [OpenAPI](https://github.com/drwpow/openapi-typescript), [GraphQL schemas](https://graphql-code-generator.com/docs/plugins/typescript)… A total win-win 🎉
 
 ---
 
@@ -26,30 +24,36 @@ Components with clear boundaries are easy to re-use, extend and overall nice to 
 
 Let’s analyze a concrete example of how we can do cleaner component APIs using TypeScript, shall we?
 
+<br/>
+
 ## Don’t expose Prop types from a component 😧
 
-```typescript:paragraph.tsx
+_`📁 paragraph.tsx`_
+
+```tsx
 export type Props = {
-  text: string;
+	text: string;
 };
 
 const Paragraph = ({ text }: Props) => <p>{text}</p>;
 ```
 
-```typescript:title.tsx
-// Title is now tightly coupled to Paragraph.txs > Props
-import { Props } from './paragraph';
+_`📁 title.tsx`_
+
+```tsx
+// Title is now tightly coupled to paragraph.txs > Props
+import { Props } from "./paragraph";
 
 const Title = ({ text }: Props) => <h1>{text}</h1>;
 ```
 
-**Why is this bad?**
+### Why is this bad?
 
 - When exposing the Prop types directly, nothing stops other developers (even your future self 😂) from importing and extending those types in other parts of the application. This breaks component’s encapsulation and creates unnecessary dependencies between components.
 - Changes to the Prop types of the original component can potentially break other parts of the app 💥
 - A cluttered API, the module exports the component and types. This can quickly turn into component files exporting multiple types, so be careful 🧐
 
----
+<br/>
 
 ## A better way ✅
 
@@ -63,14 +67,18 @@ If you have a `UserProfile` component and the **Props** declare a `User` type th
 
 Extract domain-specific types into `./types` so that they can be reused across the app.
 
-```typescript:user-types.tsx
+_`📁 user-types.ts`_
+
+```tsx
 export interface User {
-  name: string;
-  age: number;
+	name: string;
+	age: number;
 }
 ```
 
-```typescript:user-profile.tsx
+_`📁 user-profile.tsx`_
+
+```tsx
 import {User} from './user-types';
 
 type Props = {
@@ -82,7 +90,9 @@ const UserProfile = ({user, date}: Props) => ...
 export default UserProfile;
 ```
 
-```typescript:user-list.tsx
+_`📁 user-list.tsx`_
+
+```tsx
 import {User} from './user-types';
 
 type Props = {
@@ -99,7 +109,7 @@ They are valid reasons for wanting to access a component’s types, such as enha
 
 Lets check the next section to solve this!
 
----
+<br/>
 
 ## Prop type lookup ✨
 
@@ -107,18 +117,26 @@ We can leverage TypeScript’s type resolution, to enable Prop type lookup.
 
 Setup prop type lookup helper, `GetComponentProps`:
 
-```typescript:utils.ts
-export type GetComponentProps<T> = T extends React.ComponentType<infer P> | React.Component<infer P> ? P : never;
+_`📁 utils.ts`_
+
+```tsx
+export type GetComponentProps<T> = T extends
+	| React.ComponentType<infer P>
+	| React.Component<infer P>
+	? P
+	: never;
 ```
 
 Define the component that we want to extend, `Title`:
 
-```typescript:title.tsx
-type Color = 'RED' | 'BLUE' | 'GREEN';
+_`📁 title.tsx`_
+
+```tsx
+type Color = "RED" | "BLUE" | "GREEN";
 
 type Props = {
-  title: string;
-  color: Color;
+	title: string;
+	color: Color;
 };
 
 const Title = ({ title, color }: Props) => <h1 style={{ color }}>{title}</h1>;
@@ -127,26 +145,38 @@ export default Title;
 
 Extend the Title component, while keeping full type safety:
 
-```typescript:title-wrapper.tsx
-import Title from './title';
-import { GetComponentProps } from './utils';
+_`📁 title-wrapper.tsx`_
+
+```tsx
+import Title from "./title";
+import { GetComponentProps } from "./utils";
 
 type Props = GetComponentProps<typeof Title> & {
-  onClick: () => void;
+	onClick: () => void;
 };
 
 const TitleWrapper = ({ onClick, ...rest }: Props) => (
-  <button onClick={onClick}>
-    <Title {...rest} />
-  </button>
+	<button onClick={onClick}>
+		<Title {...rest} />
+	</button>
 );
 export default TitleWrapper;
 ```
 
-```typescript:index.tsx
-import TitleWrapper from 'title-wrapper'; // Full type safety and autocompletion! 🎉
+_`📁 index.tsx`_
 
-const App = () => <TitleWrapper title="Hello there" color="GREEN" onClick={() => window.alert('title pressed')} />;
+```tsx
+import TitleWrapper from "title-wrapper"; // Full type safety and autocompletion! 🎉
+
+const App = () => (
+	<TitleWrapper
+		title="Hello there"
+		color="GREEN"
+		onClick={() => window.alert("title pressed")}
+	/>
+);
 ```
+
+<br/>
 
 We managed to access the properties of `Title` from `TitleWrapper` , without manually exposing them and breaking encapsulation, great! 🎉
